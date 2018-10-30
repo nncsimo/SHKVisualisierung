@@ -21,5 +21,12 @@ namespace Gantt_Tool
         {
 
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+            string filename = openFileDialog1.InitialDirectory;
+        }
+        
     }
 }
