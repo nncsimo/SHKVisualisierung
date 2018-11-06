@@ -10,6 +10,10 @@ namespace Gantt_Tool
 {
     public class Reader
     {
+        public static void GetDirectory()
+        {
+            
+        }
         public static void ReadFromCsv(string filename)
         {
             TextReader textReader = File.OpenText(filename);

@@ -17,8 +17,6 @@ namespace Gantt_Tool
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new ReadModel());
-
-            //Reader.ReadFromCsv("sampleproject_5_jobs.csv");
         }
     }
 }
