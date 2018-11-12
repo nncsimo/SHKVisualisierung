@@ -13,8 +13,8 @@ namespace Gantt_Tool
         public int ID { get; set; }
         public int startingTime { get; set; }
         public int jobDuration { get; set; }
-        public int renewableResourceConsumption_R1 { get; set; }
-        public int renewableResourceConsumption_R2 { get; set; }
-        public int nonrenewableResourceConsumption_N1 { get; set; }
+        public int finishTime { get; set; }
+        public int[] renewableResourceConsumption{ get; set; }
+        public int[] nonrenewableResourceConsumption{ get; set; }
     }
 }
