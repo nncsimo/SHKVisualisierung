@@ -26,7 +26,7 @@ namespace Gantt_Tool
         {
             openFileDialog1.ShowDialog();
             //string filedirectory = openFileDialog1.FileName;
-            Reader.ReadFromCsv(openFileDialog1.FileName);
+            ScheduleData SData = new ScheduleData(openFileDialog1.FileName);
         }
         
     }
