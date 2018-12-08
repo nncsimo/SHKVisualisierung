@@ -39,9 +39,10 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 12);
+            this.button1.Location = new System.Drawing.Point(8, 8);
+            this.button1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(136, 65);
+            this.button1.Size = new System.Drawing.Size(91, 42);
             this.button1.TabIndex = 0;
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
@@ -53,31 +54,33 @@
             this.chart1.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(154, 12);
+            this.chart1.Location = new System.Drawing.Point(103, 8);
+            this.chart1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.chart1.Name = "chart1";
+            this.chart1.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.None;
             series1.BorderWidth = 2;
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.RangeBar;
             series1.CustomProperties = "BarLabelStyle=Left";
             series1.Legend = "Legend1";
             series1.Name = "Data1";
-            series1.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Grayscale;
             series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Int64;
             series1.YValuesPerPoint = 2;
             series1.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Int64;
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(1082, 651);
+            this.chart1.Size = new System.Drawing.Size(721, 417);
             this.chart1.TabIndex = 1;
             this.chart1.Text = "chart1";
             this.chart1.Click += new System.EventHandler(this.chart1_Click);
             // 
             // ReadModel
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1248, 675);
+            this.ClientSize = new System.Drawing.Size(832, 432);
             this.Controls.Add(this.chart1);
             this.Controls.Add(this.button1);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "ReadModel";
             this.Text = "Form2";
             this.Load += new System.EventHandler(this.ReadModel_Load);
