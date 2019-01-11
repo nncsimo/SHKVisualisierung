@@ -70,9 +70,15 @@ namespace Gantt_Tool
                 }
 
                 // Calculate makespan
+
+                Makespan = 0;
+
                 for (int i = 0; i < NumberOfActivities; i++)
                 {
-                    Makespan += ListOfActivities[i].jobDuration;
+                    if (ListOfActivities[i].finishTime > Makespan)
+                    {
+                        Makespan = ListOfActivities[i].finishTime;
+                    }
                 }
 
                 // Calculate ResourceConsumptionAtTime
