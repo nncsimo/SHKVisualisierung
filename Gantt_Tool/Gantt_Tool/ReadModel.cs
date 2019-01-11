@@ -13,55 +13,37 @@ namespace Gantt_Tool
 {
     public partial class ReadModel : Form
     {
+        //private Rectangle r1;
+        //private Rectangle r2;
         public ReadModel()
-        {
+        {                      
+            
             InitializeComponent();
+           
         }
 
-        private void ReadModel_Load(object sender, EventArgs e)
+        public void ReadModel_Load(object sender, EventArgs e)
         {
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public void button1_Click(object sender, EventArgs e)
         {
-            openFileDialog1.ShowDialog();
+            //openFileDialog1.ShowDialog();
             //string filedirectory = openFileDialog1.FileName;
-            ScheduleData SData = new ScheduleData(openFileDialog1.FileName);
+            //ScheduleData SData = new ScheduleData(openFileDialog1.FileName);
 
-            CreateChart(SData);
+            CreateChart();
         }
 
-        private void chart1_Click(object sender, EventArgs e)
+        public void chart1_Click(object sender, EventArgs e)
         {
-        }
-        
+            
+        }               
 
-        private int AddBox(Series s, float x, float y, float w, float h, string label)
+        public void CreateChart()
         {
-            return AddBox(s, new PointF(x, y), new SizeF(w, h), label);
-        }
-
-        private int AddBox(Series s, PointF pt, SizeF sz, string label)
-        {
-            int i = s.Points.AddXY(pt.X, pt.Y);
-            s.Points[i].Tag = sz;
-            s.Points[i].Label = label;
-            s.Points[i].LabelForeColor = Color.Transparent;
-            s.Points[i].Color = Color.Transparent;
-            return i;
-        }
-
-        private void CreateChart(ScheduleData initData)
-        {
-            //for (int i = 0; i < initData.NumberOfActivities; i++)
-            //{
-            //    chart1.Series.Add($"a{i}");
-            //    chart1.Series[$"a{i}"].Points.Add(new DataPoint(initData.ListOfActivities[i].startingTime, initData.ListOfActivities[i].renewableResourceConsumption[1]));
-            //    chart1.Series[$"a{i}"].Points.Add(new DataPoint(initData.ListOfActivities[i].finishTime, initData.ListOfActivities[i].renewableResourceConsumption[1]));
-            //    chart1.Series[$"a{i}"].ChartType = SeriesChartType.StackedArea;
-            //}
-
+            
             Axis ax = chart1.ChartAreas[0].AxisX;
             Axis ay = chart1.ChartAreas[0].AxisY;
             ax.Maximum = 9;  // pick or calculate
@@ -71,21 +53,36 @@ namespace Gantt_Tool
             ax.MajorGrid.Enabled = false;
             ay.MajorGrid.Enabled = false;
 
-            Series s1 = chart1.Series.Add("A");
-            s1.ChartType = SeriesChartType.Point;
+            Series series1 = chart1.Series[0];
+            series1.ChartType = SeriesChartType.Point;
 
-            AddBox(s1, 1, 0, 3, 1, "# 1");
-            //AddBox(s, 2, 1, 2, 2, "# 2");
-            //AddBox(s, 4, 0, 4, 2, "# 3");
-            //AddBox(s, 4, 2, 2, 2, "# 4");
-            //AddBox(s, 4, 4, 1, 1, "# 5");
+            //setMinMax(chart1, chart1.ChartAreas[0]);
 
-            chart1_PostPaint(chart1);
-            setMinMax(chart1, chart1.ChartAreas[0]);
-
+            AddBox(series1, 1, 0, 3, 1, "# 1");
+            AddBox(series1, 2, 1, 2, 2, "# 2");
+            AddBox(series1, 4, 0, 4, 2, "# 3");
+            AddBox(series1, 4, 2, 2, 2, "# 4");
+            AddBox(series1, 4, 4, 1, 1, "# 5");
+            
+            this.chart1.PostPaint += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ChartPaintEventArgs>(this.PostPaint);
         }
-        private void chart1_PostPaint(ChartPaintEventArgs e)
+        public int AddBox(Series s, float x, float y, float w, float h, string label)
         {
+            return AddBox(s, new PointF(x, y), new SizeF(w, h), label);
+        }
+
+        public int AddBox(Series s, PointF pt, SizeF sz, string label)
+        {
+            int i = s.Points.AddXY(pt.X, pt.Y);
+            s.Points[i].Tag = sz;
+            s.Points[i].Label = label;
+            s.Points[i].LabelForeColor = Color.Transparent;
+            s.Points[i].Color = Color.Transparent;
+            return i;
+        }
+
+        public void PostPaint(object sender, System.Windows.Forms.DataVisualization.Charting.ChartPaintEventArgs e)
+        {            
             if (chart1.Series[0].Points.Count <= 0) return;
 
             Axis ax = chart1.ChartAreas[0].AxisX;
@@ -117,19 +114,24 @@ namespace Gantt_Tool
                 }
         }
 
-        private void setMinMax(Chart chart, ChartArea ca)
+        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
-            var allPoints = chart.Series.SelectMany(x => x.Points);
-            double minx = allPoints.Select(x => x.XValue).Min();
-            double miny = allPoints.Select(x => x.YValues[0]).Min();
-            double maxx = allPoints.Select(x => x.XValue + ((SizeF)x.Tag).Width).Max();
-            double maxy = allPoints.Select(x => x.YValues[0] + ((SizeF)x.Tag).Height).Max();
 
-            ca.AxisX.Minimum = minx;
-            ca.AxisX.Maximum = maxx;
-            ca.AxisY.Minimum = miny;
-            ca.AxisY.Maximum = maxy;
         }
+
+        //private void setMinMax(Chart chart, ChartArea ca)
+        //{
+        //    var allPoints = chart.Series.SelectMany(x => x.Points);
+        //    double minx = allPoints.Select(x => x.XValue).Min();
+        //    double miny = allPoints.Select(x => x.YValues[0]).Min();
+        //    double maxx = allPoints.Select(x => x.XValue + ((SizeF)x.Tag).Width).Max();
+        //    double maxy = allPoints.Select(x => x.YValues[0] + ((SizeF)x.Tag).Height).Max();
+
+        //    ca.AxisX.Minimum = minx;
+        //    ca.AxisX.Maximum = maxx;
+        //    ca.AxisY.Minimum = miny;
+        //    ca.AxisY.Maximum = maxy;
+        //}
     }
 }
 
