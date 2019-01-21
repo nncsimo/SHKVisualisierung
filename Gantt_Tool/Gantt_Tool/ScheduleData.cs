@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Gantt_Tool
 {
-    class ScheduleData
+    public class ScheduleData
     {
         public int NumberOfActivities { get; set; }
         public int NumberOfRenewableResources { get; set; }
@@ -18,6 +18,10 @@ namespace Gantt_Tool
         /* ResourceConsumptionAtTime Array dient zur Speicherung der Ressourcenverbräuche 
         der erneuerbaren Ressourcen zu jedem Zeitpunkt t bis zum Ende des Makespan*/
         public int[,] ResourceConsumptionAtTime { get; set; }
+
+        public bool[,] ActiveActivitiesAtTime { get; set; }
+
+        public int[] MaximumResourceConsumption { get; set; }
 
         public ScheduleData(string filename) {
             using (StreamReader sr = new StreamReader(filename))
@@ -97,7 +101,33 @@ namespace Gantt_Tool
                         }
                     }
                 }
+
+                MaximumResourceConsumption = new int[NumberOfRenewableResources];
+                //MaximumResourceConsumption[i] = 0;
+
+                for (int i = 0; i < NumberOfRenewableResources; i++)
+                {
+                    for (int j = 0; j < Makespan; j++)
+                    {                       
+                        if (MaximumResourceConsumption[i] < ResourceConsumptionAtTime[i,j])
+                        {
+                            MaximumResourceConsumption[i] = ResourceConsumptionAtTime[i,j];
+                        }                        
+                    }         
+                }                                 
                 
+                ActiveActivitiesAtTime = new bool[Makespan, NumberOfActivities];
+
+                for (int t = 0; t < Makespan; t++) // Time
+                {
+                    for (int z = 0; z < NumberOfActivities; z++)
+                    {
+                        if (ListOfActivities[z].startingTime <= t && t < ListOfActivities[z].finishTime)
+                        {
+                            ActiveActivitiesAtTime[t, z] = true;
+                        }
+                    }
+                }
             }
         }       
     }

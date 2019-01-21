@@ -29,11 +29,11 @@ namespace Gantt_Tool
 
         public void button1_Click(object sender, EventArgs e)
         {
-            //openFileDialog1.ShowDialog();
-            //string filedirectory = openFileDialog1.FileName;
-            //ScheduleData SData = new ScheduleData(openFileDialog1.FileName);
+            openFileDialog1.ShowDialog();
+            string filedirectory = openFileDialog1.FileName;
+            ScheduleData SData = new ScheduleData(openFileDialog1.FileName);
 
-            CreateChart();
+            CreateChart(SData);
         }
 
         public void chart1_Click(object sender, EventArgs e)
@@ -41,30 +41,29 @@ namespace Gantt_Tool
             
         }               
 
-        public void CreateChart()
+        public void CreateChart(ScheduleData S)
         {
-            
             Axis ax = chart1.ChartAreas[0].AxisX;
             Axis ay = chart1.ChartAreas[0].AxisY;
-            ax.Maximum = 9;  // pick or calculate
-            ay.Maximum = 6;  // minimum and..
+            ax.Maximum = S.Makespan;  // pick or calculate
+            ay.Maximum = S.MaximumResourceConsumption[0];  // Noch Hardcoded, muss aber in Zukunft abhängig von der Auswahl der zu visualisierenden Ressource durch den Nutzer gewählt werden
             ax.Interval = 1; // maximum values..
             ay.Interval = 1; // .. needed
             ax.MajorGrid.Enabled = false;
             ay.MajorGrid.Enabled = false;
 
             Series series1 = chart1.Series[0];
-            series1.ChartType = SeriesChartType.Point;
+            series1.ChartType = SeriesChartType.Point;                      
 
-            //setMinMax(chart1, chart1.ChartAreas[0]);
+            ////setMinMax(chart1, chart1.ChartAreas[0]);
 
-            AddBox(series1, 1, 0, 3, 1, "# 1");
-            AddBox(series1, 2, 1, 2, 2, "# 2");
-            AddBox(series1, 4, 0, 4, 2, "# 3");
-            AddBox(series1, 4, 2, 2, 2, "# 4");
-            AddBox(series1, 4, 4, 1, 1, "# 5");
+            //AddBox(series1, 1, 0, 3, 1, "# 1");
+            //AddBox(series1, 2, 1, 2, 2, "# 2");
+            //AddBox(series1, 4, 0, 4, 2, "# 3");
+            //AddBox(series1, 4, 2, 2, 2, "# 4");
+            //AddBox(series1, 4, 4, 1, 1, "# 5");
             
-            this.chart1.PostPaint += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ChartPaintEventArgs>(this.PostPaint);
+            //this.chart1.PostPaint += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ChartPaintEventArgs>(this.PostPaint);
         }
         public int AddBox(Series s, float x, float y, float w, float h, string label)
         {
@@ -117,21 +116,7 @@ namespace Gantt_Tool
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
 
-        }
-
-        //private void setMinMax(Chart chart, ChartArea ca)
-        //{
-        //    var allPoints = chart.Series.SelectMany(x => x.Points);
-        //    double minx = allPoints.Select(x => x.XValue).Min();
-        //    double miny = allPoints.Select(x => x.YValues[0]).Min();
-        //    double maxx = allPoints.Select(x => x.XValue + ((SizeF)x.Tag).Width).Max();
-        //    double maxy = allPoints.Select(x => x.YValues[0] + ((SizeF)x.Tag).Height).Max();
-
-        //    ca.AxisX.Minimum = minx;
-        //    ca.AxisX.Maximum = maxx;
-        //    ca.AxisY.Minimum = miny;
-        //    ca.AxisY.Maximum = maxy;
-        //}
+        }        
     }
 }
 

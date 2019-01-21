@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Gantt_Tool
 {
-    class Activity
+    public class Activity
     {
         public int ID { get; set; }
         public int startingTime { get; set; }
