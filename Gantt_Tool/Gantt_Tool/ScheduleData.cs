@@ -23,6 +23,10 @@ namespace Gantt_Tool
 
         public int[] MaximumResourceConsumption { get; set; }
 
+        public List<Activity> AlreadyPainted { get; set; }
+
+        public List<Activity> CurrentActivities { get; set; }
+
         public ScheduleData(string filename) {
             using (StreamReader sr = new StreamReader(filename))
             {
@@ -44,6 +48,10 @@ namespace Gantt_Tool
 
                 // Create ListofActivities
                 ListOfActivities = new List<Activity>();
+
+                AlreadyPainted = new List<Activity>();
+
+                CurrentActivities = new List<Activity>();
 
                 // Read activity data
                 for (int i = 0; i < NumberOfActivities; i++)

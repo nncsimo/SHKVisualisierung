@@ -53,17 +53,54 @@ namespace Gantt_Tool
             ay.MajorGrid.Enabled = false;
 
             Series series1 = chart1.Series[0];
-            series1.ChartType = SeriesChartType.Point;                      
+            series1.ChartType = SeriesChartType.Point;
 
-            ////setMinMax(chart1, chart1.ChartAreas[0]);
+            for (int i = 0; i < S.Makespan; i++)
+            {
+                if (S.AlreadyPainted.Count != 0)
+                {
+                    S.AlreadyPainted.RemoveAll(x => x.finishTime <= i);
+                }
 
-            //AddBox(series1, 1, 0, 3, 1, "# 1");
-            //AddBox(series1, 2, 1, 2, 2, "# 2");
-            //AddBox(series1, 4, 0, 4, 2, "# 3");
-            //AddBox(series1, 4, 2, 2, 2, "# 4");
-            //AddBox(series1, 4, 4, 1, 1, "# 5");
-            
-            //this.chart1.PostPaint += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ChartPaintEventArgs>(this.PostPaint);
+                for (int j = 0; j < S.NumberOfActivities; j++)
+                {
+                    if (S.ActiveActivitiesAtTime[i, j] == true && !S.AlreadyPainted.Any(x => x.ID == j+1))
+                    {
+                        S.CurrentActivities.Add(S.ListOfActivities[j]);
+                    }                    
+                }
+
+                if (S.CurrentActivities.Count != 0)
+                {
+                    S.CurrentActivities.OrderByDescending(x => x.jobDuration);
+                }
+
+                
+
+                while (S.CurrentActivities.Count != 0)
+                {
+                    int y = 0;
+                    if (S.AlreadyPainted.Count == 0)
+                    {
+                        AddBox(series1, S.CurrentActivities[0].startingTime, 0, S.CurrentActivities[0].jobDuration, S.CurrentActivities[0].renewableResourceConsumption[0], Convert.ToString(S.CurrentActivities[0].ID)); // x,y,b,h,ID, renewableResourceConsumption[0] hardcoded, in Zukunft Auswahl der Ressource im Programm
+                        S.AlreadyPainted.Add(S.CurrentActivities[0]);
+                        S.CurrentActivities.RemoveAt(0);                       
+                    }
+                    else
+                    {
+                        
+                        for (int k  = 0; k < S.AlreadyPainted.Count; k++)
+                        {
+                            y += S.AlreadyPainted[k].renewableResourceConsumption[0]; //TODO:in Zukunft variabel abhängig vom Ressourcentyp 
+                        }
+                        
+                        AddBox(series1, S.CurrentActivities[0].startingTime, y, S.CurrentActivities[0].jobDuration, S.CurrentActivities[0].renewableResourceConsumption[0], Convert.ToString(S.CurrentActivities[0].ID));
+                        S.AlreadyPainted.Add(S.CurrentActivities[0]);
+                        S.CurrentActivities.RemoveAt(0);
+                    }
+                }
+            }            
+            this.chart1.PostPaint += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ChartPaintEventArgs>(this.PostPaint);
         }
         public int AddBox(Series s, float x, float y, float w, float h, string label)
         {
