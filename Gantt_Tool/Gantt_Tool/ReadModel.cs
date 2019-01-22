@@ -51,7 +51,7 @@ namespace Gantt_Tool
             ay.Interval = 1; // .. needed
             ax.MajorGrid.Enabled = false;
             ay.MajorGrid.Enabled = false;
-
+            //popokacki
             Series series1 = chart1.Series[0];
             series1.ChartType = SeriesChartType.Point;
 
