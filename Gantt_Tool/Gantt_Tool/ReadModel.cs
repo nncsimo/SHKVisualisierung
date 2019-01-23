@@ -29,6 +29,8 @@ namespace Gantt_Tool
 
         public void button1_Click(object sender, EventArgs e)
         {
+            chart1.Series[0].Points.Clear();
+
             openFileDialog1.ShowDialog();
             string filedirectory = openFileDialog1.FileName;
             ScheduleData SData = new ScheduleData(openFileDialog1.FileName);
@@ -45,13 +47,13 @@ namespace Gantt_Tool
         {
             Axis ax = chart1.ChartAreas[0].AxisX;
             Axis ay = chart1.ChartAreas[0].AxisY;
-            ax.Maximum = S.Makespan;  // pick or calculate
-            ay.Maximum = S.MaximumResourceConsumption[0];  //TODO: Noch Hardcoded, muss aber in Zukunft abhängig von der Auswahl der zu visualisierenden Ressource durch den Nutzer gewählt werden
-            ax.Interval = 1; // maximum values..
-            ay.Interval = 1; // .. needed
+            ax.Maximum = S.Makespan + 1;  
+            ay.Maximum = S.MaximumResourceConsumption[0] + 1;  //TODO: Noch Hardcoded, muss aber in Zukunft abhängig von der Auswahl der zu visualisierenden Ressource durch den Nutzer gewählt werden
+            ax.Interval = 1; 
+            ay.Interval = 1; 
             ax.MajorGrid.Enabled = false;
             ay.MajorGrid.Enabled = false;
-            //popokacki
+
             Series series1 = chart1.Series[0];
             series1.ChartType = SeriesChartType.Point;
 
@@ -72,10 +74,8 @@ namespace Gantt_Tool
 
                 if (S.CurrentActivities.Count != 0)
                 {
-                    S.CurrentActivities.OrderByDescending(x => x.jobDuration);
-                }
-
-                
+                    S.CurrentActivities = S.CurrentActivities.OrderByDescending(x => x.jobDuration).ToList();
+                }             
 
                 while (S.CurrentActivities.Count != 0)
                 {
@@ -87,8 +87,7 @@ namespace Gantt_Tool
                         S.CurrentActivities.RemoveAt(0);                       
                     }
                     else
-                    {
-                        
+                    {                     
                         for (int k  = 0; k < S.AlreadyPainted.Count; k++)
                         {
                             y += S.AlreadyPainted[k].renewableResourceConsumption[0]; //TODO:in Zukunft variabel abhängig vom Ressourcentyp 
@@ -153,7 +152,12 @@ namespace Gantt_Tool
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
 
-        }        
+        }
+
+        private void chart1_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }
 
