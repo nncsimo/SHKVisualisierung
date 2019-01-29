@@ -59,7 +59,8 @@ namespace Gantt_Tool
                     initData = Array.ConvertAll(sr.ReadLine().Split(charSeperator, StringSplitOptions.RemoveEmptyEntries), int.Parse);
 
                     int z = 0;
-                    int id = initData[z]; z++;
+                    int userid = initData[z]; z++;
+                    int id = i;
                     int startTime = initData[z]; z++;
                     int jobDuration = initData[z]; z++;
 
@@ -76,7 +77,7 @@ namespace Gantt_Tool
                         nonrenewResDump[j] = initData[j + NumberOfRenewableResources + z];
                     }
 
-                    Activity activity = new Activity(id, startTime, jobDuration, renewResDump, nonrenewResDump);
+                    Activity activity = new Activity(userid, id, startTime, jobDuration, renewResDump, nonrenewResDump);
 
                     ListOfActivities.Add(activity);
                 }

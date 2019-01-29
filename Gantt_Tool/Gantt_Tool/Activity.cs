@@ -10,6 +10,7 @@ namespace Gantt_Tool
 {
     public class Activity
     {
+        public int UserID { get; set; }
         public int ID { get; set; }
         public int startingTime { get; set; }
         public int jobDuration { get; set; }
@@ -17,8 +18,9 @@ namespace Gantt_Tool
         public int[] renewableResourceConsumption{ get; set; }
         public int[] nonrenewableResourceConsumption{ get; set; }
 
-        public Activity(int initID, int initStart, int initJobDur, int[] initRenewCons, int[] initNonRenewCons)
+        public Activity(int inituserID, int initID, int initStart, int initJobDur, int[] initRenewCons, int[] initNonRenewCons)
         {
+            UserID = inituserID;
             ID = initID;
             startingTime = initStart;
             jobDuration = initJobDur;

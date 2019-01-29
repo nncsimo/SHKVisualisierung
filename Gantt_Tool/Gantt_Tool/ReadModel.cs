@@ -66,7 +66,7 @@ namespace Gantt_Tool
 
                 for (int j = 0; j < S.NumberOfActivities; j++)
                 {
-                    if (S.ActiveActivitiesAtTime[i, j] == true && !S.AlreadyPainted.Any(x => x.ID == j+1))
+                    if (S.ActiveActivitiesAtTime[i, j] == true && !S.AlreadyPainted.Any(x => x.ID == j))
                     {
                         S.CurrentActivities.Add(S.ListOfActivities[j]);
                     }                    
@@ -82,7 +82,7 @@ namespace Gantt_Tool
                     int y = 0;
                     if (S.AlreadyPainted.Count == 0)
                     {
-                        AddBox(series1, S.CurrentActivities[0].startingTime, 0, S.CurrentActivities[0].jobDuration, S.CurrentActivities[0].renewableResourceConsumption[0], Convert.ToString(S.CurrentActivities[0].ID)); //TODO: renewableResourceConsumption[0] hardcoded, in Zukunft Auswahl der Ressource im Programm
+                        AddBox(series1, S.CurrentActivities[0].startingTime, 0, S.CurrentActivities[0].jobDuration, S.CurrentActivities[0].renewableResourceConsumption[0], Convert.ToString(S.CurrentActivities[0].UserID)); //TODO: renewableResourceConsumption[0] hardcoded, in Zukunft Auswahl der Ressource im Programm
                         S.AlreadyPainted.Add(S.CurrentActivities[0]);
                         S.CurrentActivities.RemoveAt(0);                       
                     }
@@ -93,7 +93,7 @@ namespace Gantt_Tool
                             y += S.AlreadyPainted[k].renewableResourceConsumption[0]; //TODO:in Zukunft variabel abhängig vom Ressourcentyp 
                         }
                         
-                        AddBox(series1, S.CurrentActivities[0].startingTime, y, S.CurrentActivities[0].jobDuration, S.CurrentActivities[0].renewableResourceConsumption[0], Convert.ToString(S.CurrentActivities[0].ID));
+                        AddBox(series1, S.CurrentActivities[0].startingTime, y, S.CurrentActivities[0].jobDuration, S.CurrentActivities[0].renewableResourceConsumption[0], Convert.ToString(S.CurrentActivities[0].UserID));
                         S.AlreadyPainted.Add(S.CurrentActivities[0]);
                         S.CurrentActivities.RemoveAt(0);
                     }
