@@ -13,10 +13,13 @@ namespace Gantt_Tool
 {
     public partial class ReadModel : Form
     {
-        public ReadModel(UserSettings SelectedSettings)
+        private Settings _ParentForm;
+
+        public ReadModel(Settings parentForm, UserSettings SelectedSettings)
         {
             
             InitializeComponent();
+            _ParentForm = parentForm;
             chart1.Series[0].Points.Clear();
             CreateChart(SelectedSettings);
 
@@ -138,6 +141,18 @@ namespace Gantt_Tool
                         g.DrawString(dp.Label, Font, Brushes.Black, rect, fmt);
                     }
                 }
+        }
+
+        public void ExportToPng()
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(ExportToPng));
+            }
+            else
+            {
+                chart1.SaveImage("test.png", ChartImageFormat.Png);
+            }                    
         }
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)

@@ -15,6 +15,7 @@ namespace Gantt_Tool
     public partial class Settings : Form
     {
         UserSettings CurrentSettings { get; set; }
+        private ReadModel ChildForm;
 
         public Settings()
         {
@@ -46,8 +47,10 @@ namespace Gantt_Tool
 
         public void RefreshSchedule_Click(object sender, EventArgs e)
         {
+
             CurrentSettings.DisplayedResource = Convert.ToInt32(SelectResourceType.SelectedIndex); //TODO: richtet sich derzeit noch nach .SelectedIndex, müsste aber den tatsächlichen Value berücksichtigen
-            new Thread(() => new ReadModel(CurrentSettings).ShowDialog()).Start();
+            ChildForm = new ReadModel(this, CurrentSettings);
+            new Thread(() => ChildForm.ShowDialog()).Start();
         }
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
@@ -58,6 +61,11 @@ namespace Gantt_Tool
         private void SelectResourceType_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void ExportToPNG_Click(object sender, EventArgs e)
+        {
+            ChildForm.ExportToPng();
         }
     }
 }
