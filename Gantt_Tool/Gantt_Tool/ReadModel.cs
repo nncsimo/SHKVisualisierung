@@ -88,7 +88,9 @@ namespace Gantt_Tool
                         SelectedSettings.SelectedSchedule.CurrentActivities.RemoveAt(0);
                     }
                 }
-            }            
+            }
+
+            SelectedSettings.SelectedSchedule.AlreadyPainted.Clear();
             this.chart1.PostPaint += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ChartPaintEventArgs>(this.PostPaint);
         }
         public int AddBox(Series s, float x, float y, float w, float h, string label)
