@@ -45,6 +45,7 @@ namespace Gantt_Tool
             ay.Interval = 1; 
             ax.MajorGrid.Enabled = false;
             ay.MajorGrid.Enabled = false;
+            
 
             Series series1 = chart1.Series[0];
             series1.ChartType = SeriesChartType.Point;
