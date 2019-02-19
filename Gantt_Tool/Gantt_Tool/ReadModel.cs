@@ -21,6 +21,8 @@ namespace Gantt_Tool
             InitializeComponent();
             _ParentForm = parentForm;
             chart1.Series[0].Points.Clear();
+            CalculateBoxes(SelectedSettings);
+
             CreateChart(SelectedSettings);
 
         }
@@ -34,6 +36,93 @@ namespace Gantt_Tool
         {
             
         }               
+
+        public void CalculateBoxes(UserSettings Set)
+        {
+            for (int i = 0; i < Set.SelectedSchedule.Makespan; i++)
+            {
+                if (Set.SelectedSchedule.CurrentActivities.Count != 0)
+                {
+                    Set.SelectedSchedule.CurrentActivities.RemoveAll(x => x.finishTime <= i);
+                }
+
+                for (int j = 0; j < Set.SelectedSchedule.NumberOfActivities; j++)
+                {
+                    if (Set.SelectedSchedule.ActiveActivitiesAtTime[i, j] == true && !Set.SelectedSchedule.CurrentActivities.Any(x => x.ID == j) )
+                    {
+                        Set.SelectedSchedule.CurrentActivities.Add(Set.SelectedSchedule.ListOfActivities[j]);
+                    }
+                }
+
+                if (Set.SelectedSchedule.CurrentActivities.Count > 0)
+                {
+                    if (!Set.SelectedSchedule.CurrentActivities.Intersect(Set.SelectedSchedule.AlreadyPainted).Any())
+                    {
+                        Set.SelectedSchedule.CurrentActivities = Set.SelectedSchedule.CurrentActivities.OrderByDescending(x => x.jobDuration).ToList();
+
+                        for (int k = 0; k < Set.SelectedSchedule.CurrentActivities.Count; k++)
+                        {
+                            int y = 0;
+
+                            foreach (Activity act in Set.SelectedSchedule.CurrentActivities.Intersect(Set.SelectedSchedule.AlreadyPainted))
+                            {
+                                y += act.renewableResourceConsumption[Set.DisplayedResource];
+                            }
+
+                            Set.SelectedSchedule.CurrentActivities[k].yValue = y;
+                            Set.SelectedSchedule.AlreadyPainted.Add(Set.SelectedSchedule.CurrentActivities[k]);
+                        }
+                    }
+                    else if (Set.SelectedSchedule.CurrentActivities.Intersect(Set.SelectedSchedule.AlreadyPainted).Any())
+                    {
+                        List<Activity> ToPaint = new List<Activity>();
+                        int count = Set.SelectedSchedule.CurrentActivities.Except(Set.SelectedSchedule.AlreadyPainted).Count();
+
+                        ToPaint = Set.SelectedSchedule.CurrentActivities.Except(Set.SelectedSchedule.AlreadyPainted).ToList();
+                        ToPaint = ToPaint.OrderByDescending(x => x.jobDuration).ToList();
+
+                        if (count > 0)
+                        {
+                            for (int w = 0; w < count; w++)
+                            {                           
+                                    List<Activity> CurrentAndPainted = Set.SelectedSchedule.CurrentActivities.Intersect(Set.SelectedSchedule.AlreadyPainted).ToList();
+                                    CurrentAndPainted = CurrentAndPainted.OrderBy(x => x.yValue).ToList();
+
+                                    for (int s = 0; s < CurrentAndPainted.Count + 1; s++)
+                                    {
+                                        if (s == 0)
+                                        {
+                                            if (ToPaint[w].renewableResourceConsumption[Set.DisplayedResource] <= CurrentAndPainted[s].yValue)
+                                            {
+                                                ToPaint[w].yValue = 0;
+                                                Set.SelectedSchedule.AlreadyPainted.Add(ToPaint[w]);
+                                                break;
+                                            }
+                                        }
+                                        else if (s == CurrentAndPainted.Count)
+                                        {
+                                            ToPaint[w].yValue = CurrentAndPainted[CurrentAndPainted.Count - 1].yValue + CurrentAndPainted[CurrentAndPainted.Count - 1].renewableResourceConsumption[Set.DisplayedResource];
+                                            Set.SelectedSchedule.AlreadyPainted.Add(ToPaint[w]);
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            if (ToPaint[w].renewableResourceConsumption[Set.DisplayedResource] <= (CurrentAndPainted[s].yValue - (CurrentAndPainted[s - 1].yValue + CurrentAndPainted[s - 1].renewableResourceConsumption[Set.DisplayedResource])))
+                                            {
+                                                ToPaint[w].yValue = CurrentAndPainted[s - 1].yValue + CurrentAndPainted[s - 1].renewableResourceConsumption[Set.DisplayedResource];
+                                                Set.SelectedSchedule.AlreadyPainted.Add(ToPaint[w]);
+                                                break;
+                                            }
+                                        }
+                                    }
+                            }
+                            
+                        }
+
+                    }
+                }
+            }
+        }
 
         public void CreateChart(UserSettings SelectedSettings)
         {
