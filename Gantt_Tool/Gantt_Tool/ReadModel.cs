@@ -126,65 +126,28 @@ namespace Gantt_Tool
 
         public void CreateChart(UserSettings SelectedSettings)
         {
+
             Axis ax = chart1.ChartAreas[0].AxisX;
             Axis ay = chart1.ChartAreas[0].AxisY;
-            ax.Maximum = SelectedSettings.SelectedSchedule.Makespan + 1;  
-            ay.Maximum = SelectedSettings.SelectedSchedule.MaximumResourceConsumption[SelectedSettings.DisplayedResource] + 1;
-            ax.Interval = 1; 
-            ay.Interval = 1; 
+            ax.Maximum = SelectedSettings.SelectedSchedule.Makespan + 1;
+            ay.Maximum = SelectedSettings.SelectedSchedule.ListOfActivities.Max(x => x.yValue) + 4;
+            ax.Interval = 1;
+            ay.Interval = 1;
             ax.MajorGrid.Enabled = false;
             ay.MajorGrid.Enabled = false;
-            
+
 
             Series series1 = chart1.Series[0];
             series1.ChartType = SeriesChartType.Point;
 
-            for (int i = 0; i < SelectedSettings.SelectedSchedule.Makespan; i++)
+            foreach (Activity activity in SelectedSettings.SelectedSchedule.ListOfActivities)
             {
-                if (SelectedSettings.SelectedSchedule.AlreadyPainted.Count != 0)
-                {
-                    SelectedSettings.SelectedSchedule.AlreadyPainted.RemoveAll(x => x.finishTime <= i);
-                }
-
-                for (int j = 0; j < SelectedSettings.SelectedSchedule.NumberOfActivities; j++)
-                {
-                    if (SelectedSettings.SelectedSchedule.ActiveActivitiesAtTime[i, j] == true && !SelectedSettings.SelectedSchedule.AlreadyPainted.Any(x => x.ID == j))
-                    {
-                        SelectedSettings.SelectedSchedule.CurrentActivities.Add(SelectedSettings.SelectedSchedule.ListOfActivities[j]);
-                    }                    
-                }
-
-                if (SelectedSettings.SelectedSchedule.CurrentActivities.Count != 0)
-                {
-                    SelectedSettings.SelectedSchedule.CurrentActivities = SelectedSettings.SelectedSchedule.CurrentActivities.OrderByDescending(x => x.jobDuration).ToList();
-                }             
-
-                while (SelectedSettings.SelectedSchedule.CurrentActivities.Count != 0)
-                {
-                    int y = 0;
-                    if (SelectedSettings.SelectedSchedule.AlreadyPainted.Count == 0)
-                    {
-                        AddBox(series1, SelectedSettings.SelectedSchedule.CurrentActivities[0].startingTime, 0, SelectedSettings.SelectedSchedule.CurrentActivities[0].jobDuration, SelectedSettings.SelectedSchedule.CurrentActivities[0].renewableResourceConsumption[SelectedSettings.DisplayedResource], Convert.ToString(SelectedSettings.SelectedSchedule.CurrentActivities[0].UserID)); 
-                        SelectedSettings.SelectedSchedule.AlreadyPainted.Add(SelectedSettings.SelectedSchedule.CurrentActivities[0]);
-                        SelectedSettings.SelectedSchedule.CurrentActivities.RemoveAt(0);                       
-                    }
-                    else
-                    {                     
-                        for (int k  = 0; k < SelectedSettings.SelectedSchedule.AlreadyPainted.Count; k++)
-                        {
-                            y += SelectedSettings.SelectedSchedule.AlreadyPainted[k].renewableResourceConsumption[SelectedSettings.DisplayedResource]; 
-                        }
-                        
-                        AddBox(series1, SelectedSettings.SelectedSchedule.CurrentActivities[0].startingTime, y, SelectedSettings.SelectedSchedule.CurrentActivities[0].jobDuration, SelectedSettings.SelectedSchedule.CurrentActivities[0].renewableResourceConsumption[SelectedSettings.DisplayedResource], Convert.ToString(SelectedSettings.SelectedSchedule.CurrentActivities[0].UserID));
-                        SelectedSettings.SelectedSchedule.AlreadyPainted.Add(SelectedSettings.SelectedSchedule.CurrentActivities[0]);
-                        SelectedSettings.SelectedSchedule.CurrentActivities.RemoveAt(0);
-                    }
-                }
+                AddBox(series1, activity.startingTime, activity.yValue, activity.jobDuration, activity.renewableResourceConsumption[SelectedSettings.DisplayedResource], Convert.ToString(activity.UserID));
             }
 
-            SelectedSettings.SelectedSchedule.AlreadyPainted.Clear();
             this.chart1.PostPaint += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ChartPaintEventArgs>(this.PostPaint);
         }
+
         public int AddBox(Series s, float x, float y, float w, float h, string label)
         {
             return AddBox(s, new PointF(x, y), new SizeF(w, h), label);
