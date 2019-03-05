@@ -15,7 +15,7 @@ namespace Gantt_Tool
         public UserSettings(string filename)
         {
             SelectedSchedule = new ScheduleData(filename);
-            DisplayedResource = 0;
+            DisplayedResource = 1;
         }
 
         public void ChangeSettings()

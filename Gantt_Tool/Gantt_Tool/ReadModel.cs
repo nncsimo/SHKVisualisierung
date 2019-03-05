@@ -25,6 +25,7 @@ namespace Gantt_Tool
 
             CreateChart(SelectedSettings);
 
+            DrawResourceConsumptionAtTime(SelectedSettings);
         }
 
         public void ReadModel_Load(object sender, EventArgs e)
@@ -35,7 +36,7 @@ namespace Gantt_Tool
         public void chart1_Click(object sender, EventArgs e)
         {
             
-        }               
+        }
 
         public void CalculateBoxes(UserSettings Set)
         {
@@ -66,7 +67,7 @@ namespace Gantt_Tool
 
                             foreach (Activity act in Set.SelectedSchedule.CurrentActivities.Intersect(Set.SelectedSchedule.AlreadyPainted))
                             {
-                                y += act.renewableResourceConsumption[Set.DisplayedResource];
+                                y += act.renewableResourceConsumption[Set.DisplayedResource - 1];
                             }
 
                             Set.SelectedSchedule.CurrentActivities[k].yValue = y;
@@ -92,7 +93,7 @@ namespace Gantt_Tool
                                     {
                                         if (s == 0)
                                         {
-                                            if (ToPaint[w].renewableResourceConsumption[Set.DisplayedResource] <= CurrentAndPainted[s].yValue)
+                                            if (ToPaint[w].renewableResourceConsumption[Set.DisplayedResource - 1] <= CurrentAndPainted[s].yValue)
                                             {
                                                 ToPaint[w].yValue = 0;
                                                 Set.SelectedSchedule.AlreadyPainted.Add(ToPaint[w]);
@@ -101,15 +102,15 @@ namespace Gantt_Tool
                                         }
                                         else if (s == CurrentAndPainted.Count)
                                         {
-                                            ToPaint[w].yValue = CurrentAndPainted[CurrentAndPainted.Count - 1].yValue + CurrentAndPainted[CurrentAndPainted.Count - 1].renewableResourceConsumption[Set.DisplayedResource];
+                                            ToPaint[w].yValue = CurrentAndPainted[CurrentAndPainted.Count - 1].yValue + CurrentAndPainted[CurrentAndPainted.Count - 1].renewableResourceConsumption[Set.DisplayedResource - 1];
                                             Set.SelectedSchedule.AlreadyPainted.Add(ToPaint[w]);
                                             break;
                                         }
                                         else
                                         {
-                                            if (ToPaint[w].renewableResourceConsumption[Set.DisplayedResource] <= (CurrentAndPainted[s].yValue - (CurrentAndPainted[s - 1].yValue + CurrentAndPainted[s - 1].renewableResourceConsumption[Set.DisplayedResource])))
+                                            if (ToPaint[w].renewableResourceConsumption[Set.DisplayedResource - 1] <= (CurrentAndPainted[s].yValue - (CurrentAndPainted[s - 1].yValue + CurrentAndPainted[s - 1].renewableResourceConsumption[Set.DisplayedResource])))
                                             {
-                                                ToPaint[w].yValue = CurrentAndPainted[s - 1].yValue + CurrentAndPainted[s - 1].renewableResourceConsumption[Set.DisplayedResource];
+                                                ToPaint[w].yValue = CurrentAndPainted[s - 1].yValue + CurrentAndPainted[s - 1].renewableResourceConsumption[Set.DisplayedResource - 1];
                                                 Set.SelectedSchedule.AlreadyPainted.Add(ToPaint[w]);
                                                 break;
                                             }
@@ -126,6 +127,7 @@ namespace Gantt_Tool
 
         public void CreateChart(UserSettings SelectedSettings)
         {
+            // Set axis options
 
             Axis ax = chart1.ChartAreas[0].AxisX;
             Axis ay = chart1.ChartAreas[0].AxisY;
@@ -135,14 +137,19 @@ namespace Gantt_Tool
             ay.Interval = 1;
             ax.MajorGrid.Enabled = false;
             ay.MajorGrid.Enabled = false;
+            ax.ArrowStyle = AxisArrowStyle.Lines;
+            ay.ArrowStyle = AxisArrowStyle.Lines;
+            ax.Title = "t = time";
+            ay.Title = "Consumption of renewable resource " + SelectedSettings.DisplayedResource;
 
+            // Add boxes for the activities to the chart area
 
             Series series1 = chart1.Series[0];
             series1.ChartType = SeriesChartType.Point;
 
             foreach (Activity activity in SelectedSettings.SelectedSchedule.ListOfActivities)
             {
-                AddBox(series1, activity.startingTime, activity.yValue, activity.jobDuration, activity.renewableResourceConsumption[SelectedSettings.DisplayedResource], Convert.ToString(activity.UserID));
+                AddBox(series1, activity.startingTime, activity.yValue, activity.jobDuration, activity.renewableResourceConsumption[SelectedSettings.DisplayedResource - 1], Convert.ToString(activity.UserID));
             }
 
             this.chart1.PostPaint += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ChartPaintEventArgs>(this.PostPaint);
@@ -194,6 +201,64 @@ namespace Gantt_Tool
                         g.DrawString(dp.Label, Font, Brushes.Black, rect, fmt);
                     }
                 }
+        }
+
+        public void DrawResourceConsumptionAtTime(UserSettings SelectedSettings)
+        {
+            Series Points = chart1.Series.Add("points");
+            Points.ChartType = SeriesChartType.Point;
+
+            Series Lines = chart1.Series.Add("lines");
+            Lines.ChartType = SeriesChartType.Line;
+            Lines.Color = Color.Black;
+            Lines.BorderWidth = 2;
+
+            List<PointF> points = new List<PointF>();
+            List<Point> lines = new List<Point>();
+
+            for (int i = 0; i < SelectedSettings.SelectedSchedule.Makespan; i++)
+            {
+                points.Add(new PointF(i, SelectedSettings.SelectedSchedule.ResourceConsumptionAtTime[SelectedSettings.DisplayedResource - 1, i]));
+                points.Add(new PointF(i + 1, SelectedSettings.SelectedSchedule.ResourceConsumptionAtTime[SelectedSettings.DisplayedResource - 1, i]));
+            }
+
+            for (int i = 0; i < SelectedSettings.SelectedSchedule.Makespan * 2; i++)
+            {
+                lines.Add(new Point(i, i + 1));
+                i++;
+            }
+
+            for (int i = 1; i < points.Count - 1; i++)
+            {
+                if (points[i].Y != points[i + 2].Y)
+                {
+                    Points.Points.AddXY(points[i].X, points[i].Y);
+                }         
+                i++;
+            }
+
+            foreach (var point in Points.Points)
+            {
+                point.Color = Color.Black;
+                point.MarkerStyle = MarkerStyle.Circle;
+            }
+
+            //for (int i = 0; i < points.Count; i++)
+            //{
+            //    if (points[i].Y != points[i + 2].Y)
+            //    {
+            //        Points.Points.AddXY(points[i].X, points[i].Y);
+            //    }
+            //    i++;
+            //}
+
+            foreach (Point ln in lines)
+            {
+                int p0 = Lines.Points.AddXY(points[ln.X].X, points[ln.X].Y);
+                int p1 = Lines.Points.AddXY(points[ln.Y].X, points[ln.Y].Y);
+                Lines.Points[p0].Color = Color.Transparent;
+                Lines.Points[p1].Color = Color.Black;
+            }
         }
 
         public void ExportToPng()

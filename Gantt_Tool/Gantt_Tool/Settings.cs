@@ -38,17 +38,17 @@ namespace Gantt_Tool
 
             // Wenn SData erstellt, dann Anzeige der Einstellmöglichkeiten
 
-            for (int i = 0; i < CurrentSettings.SelectedSchedule.NumberOfRenewableResources; i++)
+            for (int i = 1; i < CurrentSettings.SelectedSchedule.NumberOfRenewableResources + 1; i++)
             {
                 SelectResourceType.Items.Add(i);
             }
-            SelectResourceType.SelectedIndex = CurrentSettings.DisplayedResource;
+            SelectResourceType.SelectedIndex = CurrentSettings.DisplayedResource - 1;
         }
 
         public void RefreshSchedule_Click(object sender, EventArgs e)
         {
-
-            CurrentSettings.DisplayedResource = Convert.ToInt32(SelectResourceType.SelectedIndex); //TODO: richtet sich derzeit noch nach .SelectedIndex, müsste aber den tatsächlichen Value berücksichtigen
+            CurrentSettings.DisplayedResource = Convert.ToInt32(SelectResourceType.SelectedItem.ToString());
+            //CurrentSettings.DisplayedResource = Convert.ToInt32(SelectResourceType.SelectedIndex); //TODO: richtet sich derzeit noch nach .SelectedIndex, müsste aber den tatsächlichen Value berücksichtigen
             ChildForm = new ReadModel(this, CurrentSettings);
             new Thread(() => ChildForm.ShowDialog()).Start();
         }
