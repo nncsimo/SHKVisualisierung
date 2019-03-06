@@ -347,7 +347,6 @@ namespace Gantt_Tool
                 chart1.Series["makespan"].Enabled = false;
             }
         }
-<<<<<<< HEAD
 
         public void ExportToPng()
         {
@@ -370,8 +369,6 @@ namespace Gantt_Tool
         {
 
         }
-=======
->>>>>>> parent of 7b4be7a... PDF-Export Method
     }
 }
 
