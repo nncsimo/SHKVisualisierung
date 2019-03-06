@@ -15,27 +15,45 @@ namespace Gantt_Tool
     public partial class Settings : Form
     {
         UserSettings CurrentSettings { get; set; }
-        private ReadModel ChildForm;
+        public ReadModel ChildForm;
+        public List<ReadModel> FormsList { get; set; }
 
         public Settings()
         {
             InitializeComponent();
+            SelectResourceType.Visible = false;
+            DisplayResourceConsumptionAtTime.Visible = false;
+            DisplayMakespan.Visible = false;
+            RefreshSchedule.Visible = false;
+            ExportToPNG.Visible = false;
+            FormsList = new List<ReadModel>();
         }
 
         public void Settings_Load(object sender, EventArgs e)
         {
-            
+
         }
 
         public void OpenFile_Click(object sender, EventArgs e)
         {
-            this.Controls.Clear();
-            this.InitializeComponent();
-
             openFileDialog1.ShowDialog();
-            string filedirectory = openFileDialog1.FileName;
-            CurrentSettings = new UserSettings(filedirectory);
+            try
+            {
+                string filedirectory = openFileDialog1.FileName;
+                CurrentSettings = new UserSettings(filedirectory);
 
+                InitializeComponent();
+                SelectResourceType.Visible = false;
+                DisplayResourceConsumptionAtTime.Visible = false;
+                DisplayMakespan.Visible = false;
+                ExportToPNG.Visible = false;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Please select a file from the file dialog window.");
+                return;
+            }       
+     
             // Wenn SData erstellt, dann Anzeige der Einstellmöglichkeiten
 
             for (int i = 1; i < CurrentSettings.SelectedSchedule.NumberOfRenewableResources + 1; i++)
@@ -48,9 +66,22 @@ namespace Gantt_Tool
         public void RefreshSchedule_Click(object sender, EventArgs e)
         {
             CurrentSettings.DisplayedResource = Convert.ToInt32(SelectResourceType.SelectedItem.ToString());
-            //CurrentSettings.DisplayedResource = Convert.ToInt32(SelectResourceType.SelectedIndex); //TODO: richtet sich derzeit noch nach .SelectedIndex, müsste aber den tatsächlichen Value berücksichtigen
+
             ChildForm = new ReadModel(this, CurrentSettings);
+            FormsList.Add(ChildForm);
+
+            //if (FormsList.Count > 1)
+            //{
+            //    CloseThread();
+            //    FormsList.RemoveAt(0);
+            //}
+         
             new Thread(() => ChildForm.ShowDialog()).Start();
+
+            SelectResourceType.Visible = true;
+            DisplayResourceConsumptionAtTime.Visible = true;
+            DisplayMakespan.Visible = true;
+            ExportToPNG.Visible = true;
         }
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
@@ -60,12 +91,41 @@ namespace Gantt_Tool
 
         private void SelectResourceType_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            
         }
 
         private void ExportToPNG_Click(object sender, EventArgs e)
         {
             ChildForm.ExportToPng();
+        }
+
+        private void CloseThread()
+        {
+            this.BeginInvoke(new MethodInvoker(FormsList[0].Close));
+        }
+
+        private void DisplayResourceConsumptionAtTime_CheckedChanged(object sender, EventArgs e)
+        {
+            if (DisplayResourceConsumptionAtTime.Checked == true)
+            {
+                ChildForm.AddResourceConsumptionAtTime();
+            }
+            if (DisplayResourceConsumptionAtTime.Checked == false)
+            {
+                ChildForm.RemoveResourceConsumptionAtTime();
+            }
+        }
+
+        private void DisplayMakespan_CheckedChanged(object sender, EventArgs e)
+        {
+            if (DisplayMakespan.Checked == true)
+            {
+                ChildForm.AddMakespan();
+            }
+            if (DisplayMakespan.Checked == false)
+            {
+                ChildForm.RemoveMakespan();
+            }
         }
     }
 }

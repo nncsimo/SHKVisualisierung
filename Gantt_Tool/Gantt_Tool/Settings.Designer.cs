@@ -33,6 +33,8 @@
             this.RefreshSchedule = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.ExportToPNG = new System.Windows.Forms.Button();
+            this.DisplayResourceConsumptionAtTime = new System.Windows.Forms.CheckBox();
+            this.DisplayMakespan = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // SelectResourceType
@@ -83,11 +85,35 @@
             this.ExportToPNG.UseVisualStyleBackColor = true;
             this.ExportToPNG.Click += new System.EventHandler(this.ExportToPNG_Click);
             // 
+            // DisplayResourceConsumptionAtTime
+            // 
+            this.DisplayResourceConsumptionAtTime.AutoSize = true;
+            this.DisplayResourceConsumptionAtTime.Location = new System.Drawing.Point(50, 225);
+            this.DisplayResourceConsumptionAtTime.Name = "DisplayResourceConsumptionAtTime";
+            this.DisplayResourceConsumptionAtTime.Size = new System.Drawing.Size(406, 29);
+            this.DisplayResourceConsumptionAtTime.TabIndex = 4;
+            this.DisplayResourceConsumptionAtTime.Text = "Display ResourceConsumptionAtTime";
+            this.DisplayResourceConsumptionAtTime.UseVisualStyleBackColor = true;
+            this.DisplayResourceConsumptionAtTime.CheckedChanged += new System.EventHandler(this.DisplayResourceConsumptionAtTime_CheckedChanged);
+            // 
+            // DisplayMakespan
+            // 
+            this.DisplayMakespan.AutoSize = true;
+            this.DisplayMakespan.Location = new System.Drawing.Point(50, 261);
+            this.DisplayMakespan.Name = "DisplayMakespan";
+            this.DisplayMakespan.Size = new System.Drawing.Size(221, 29);
+            this.DisplayMakespan.TabIndex = 5;
+            this.DisplayMakespan.Text = "Display Makespan";
+            this.DisplayMakespan.UseVisualStyleBackColor = true;
+            this.DisplayMakespan.CheckedChanged += new System.EventHandler(this.DisplayMakespan_CheckedChanged);
+            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 703);
+            this.Controls.Add(this.DisplayMakespan);
+            this.Controls.Add(this.DisplayResourceConsumptionAtTime);
             this.Controls.Add(this.ExportToPNG);
             this.Controls.Add(this.RefreshSchedule);
             this.Controls.Add(this.OpenFile);
@@ -96,6 +122,7 @@
             this.Name = "Settings";
             this.Text = "Settings";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -106,5 +133,7 @@
         private System.Windows.Forms.Button RefreshSchedule;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button ExportToPNG;
+        private System.Windows.Forms.CheckBox DisplayResourceConsumptionAtTime;
+        private System.Windows.Forms.CheckBox DisplayMakespan;
     }
 }

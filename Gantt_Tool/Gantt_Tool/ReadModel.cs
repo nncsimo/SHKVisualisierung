@@ -21,11 +21,14 @@ namespace Gantt_Tool
             InitializeComponent();
             _ParentForm = parentForm;
             chart1.Series[0].Points.Clear();
+            SelectedSettings.SelectedSchedule.CurrentActivities.Clear();
+            SelectedSettings.SelectedSchedule.AlreadyPainted.Clear();
             CalculateBoxes(SelectedSettings);
 
             CreateChart(SelectedSettings);
 
             DrawResourceConsumptionAtTime(SelectedSettings);
+            DrawMakespan(SelectedSettings);
         }
 
         public void ReadModel_Load(object sender, EventArgs e)
@@ -108,7 +111,7 @@ namespace Gantt_Tool
                                         }
                                         else
                                         {
-                                            if (ToPaint[w].renewableResourceConsumption[Set.DisplayedResource - 1] <= (CurrentAndPainted[s].yValue - (CurrentAndPainted[s - 1].yValue + CurrentAndPainted[s - 1].renewableResourceConsumption[Set.DisplayedResource])))
+                                            if (ToPaint[w].renewableResourceConsumption[Set.DisplayedResource - 1] <= (CurrentAndPainted[s].yValue - (CurrentAndPainted[s - 1].yValue + CurrentAndPainted[s - 1].renewableResourceConsumption[Set.DisplayedResource - 1])))
                                             {
                                                 ToPaint[w].yValue = CurrentAndPainted[s - 1].yValue + CurrentAndPainted[s - 1].renewableResourceConsumption[Set.DisplayedResource - 1];
                                                 Set.SelectedSchedule.AlreadyPainted.Add(ToPaint[w]);
@@ -132,7 +135,7 @@ namespace Gantt_Tool
             Axis ax = chart1.ChartAreas[0].AxisX;
             Axis ay = chart1.ChartAreas[0].AxisY;
             ax.Maximum = SelectedSettings.SelectedSchedule.Makespan + 1;
-            ay.Maximum = SelectedSettings.SelectedSchedule.ListOfActivities.Max(x => x.yValue) + 4;
+            ay.Maximum = SelectedSettings.SelectedSchedule.ListOfActivities.Max(x => x.yValue) + SelectedSettings.SelectedSchedule.ListOfActivities.FindAll(x => x.yValue == SelectedSettings.SelectedSchedule.ListOfActivities.Max(z => z.yValue)).Max(j => j.renewableResourceConsumption[SelectedSettings.DisplayedResource - 1]);
             ax.Interval = 1;
             ay.Interval = 1;
             ax.MajorGrid.Enabled = false;
@@ -179,8 +182,8 @@ namespace Gantt_Tool
             Graphics g = e.ChartGraphics.Graphics;
             using (StringFormat fmt = new StringFormat()
             {
-                Alignment = StringAlignment.Center,
-                LineAlignment = StringAlignment.Center
+                Alignment = StringAlignment.Far,
+                LineAlignment = StringAlignment.Far
             })
                 foreach (Series s in chart1.Series)
                 {
@@ -239,18 +242,33 @@ namespace Gantt_Tool
 
             foreach (var point in Points.Points)
             {
-                point.Color = Color.Black;
                 point.MarkerStyle = MarkerStyle.Circle;
+                point.MarkerSize = 8;
+                point.MarkerBorderColor = Color.Black;
+                point.MarkerColor = Color.FromArgb(255, Color.WhiteSmoke);
             }
 
-            //for (int i = 0; i < points.Count; i++)
-            //{
-            //    if (points[i].Y != points[i + 2].Y)
-            //    {
-            //        Points.Points.AddXY(points[i].X, points[i].Y);
-            //    }
-            //    i++;
-            //}
+            int count = Points.Points.Count;
+
+            for (int j = 0; j < points.Count - 1; j++)
+            {
+                if (j == 0)
+                {
+                    Points.Points.AddXY(points[j].X, points[j].Y);
+                }
+                else if(points[j].Y != points[j - 2].Y)
+                {
+                    Points.Points.AddXY(points[j].X, points[j].Y);
+                }               
+               j++;
+            }
+
+            for (int i = count; i < Points.Points.Count; i++)
+            {
+                Points.Points[i].MarkerStyle = MarkerStyle.Circle;
+                Points.Points[i].MarkerSize = 8;
+                Points.Points[i].Color = Color.Black;
+            }
 
             foreach (Point ln in lines)
             {
@@ -258,6 +276,75 @@ namespace Gantt_Tool
                 int p1 = Lines.Points.AddXY(points[ln.Y].X, points[ln.Y].Y);
                 Lines.Points[p0].Color = Color.Transparent;
                 Lines.Points[p1].Color = Color.Black;
+            }
+
+            chart1.Series["points"].Enabled = false;
+            chart1.Series["lines"].Enabled = false;
+        }
+
+        public void AddResourceConsumptionAtTime()
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(AddResourceConsumptionAtTime));
+            }
+            else
+            {
+                chart1.Series["points"].Enabled = true;
+                chart1.Series["lines"].Enabled = true;
+            }    
+        }
+
+        public void RemoveResourceConsumptionAtTime()
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(RemoveResourceConsumptionAtTime));
+            }
+            else
+            {
+                chart1.Series["points"].Enabled = false;
+                chart1.Series["lines"].Enabled = false;
+            }
+        }
+
+        public void DrawMakespan(UserSettings SelectedSettings)
+        {
+            Series MakespanLine = chart1.Series.Add("makespan");
+            MakespanLine.ChartType = SeriesChartType.Line;
+            MakespanLine.Color = Color.Blue;
+            MakespanLine.BorderWidth = 2;
+            MakespanLine.BorderDashStyle = ChartDashStyle.Dash;
+
+            int p0 = MakespanLine.Points.AddXY(SelectedSettings.SelectedSchedule.Makespan, 0);
+            int p1 = MakespanLine.Points.AddXY(SelectedSettings.SelectedSchedule.Makespan, chart1.ChartAreas[0].AxisX.Maximum);
+            MakespanLine.Points[p0].Color = Color.Transparent;
+            MakespanLine.Points[p1].Color = Color.Blue;
+
+            chart1.Series["makespan"].Enabled = false;
+        }
+
+        public void AddMakespan()
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(AddMakespan));
+            }
+            else
+            {
+                chart1.Series["makespan"].Enabled = true;
+            }
+        }
+
+        public void RemoveMakespan()
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(RemoveMakespan));
+            }
+            else
+            {
+                chart1.Series["makespan"].Enabled = false;
             }
         }
 
