@@ -98,5 +98,34 @@ namespace Gantt_Tool
         {
             ChildForm.ExportToPng();
         }
+
+        private void CloseThread()
+        {
+            this.BeginInvoke(new MethodInvoker(FormsList[0].Close));
+        }
+
+        private void DisplayResourceConsumptionAtTime_CheckedChanged(object sender, EventArgs e)
+        {
+            if (DisplayResourceConsumptionAtTime.Checked == true)
+            {
+                ChildForm.AddResourceConsumptionAtTime();
+            }
+            if (DisplayResourceConsumptionAtTime.Checked == false)
+            {
+                ChildForm.RemoveResourceConsumptionAtTime();
+            }
+        }
+
+        private void DisplayMakespan_CheckedChanged(object sender, EventArgs e)
+        {
+            if (DisplayMakespan.Checked == true)
+            {
+                ChildForm.AddMakespan();
+            }
+            if (DisplayMakespan.Checked == false)
+            {
+                ChildForm.RemoveMakespan();
+            }
+        }
     }
 }
