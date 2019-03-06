@@ -33,8 +33,11 @@
             this.RefreshSchedule = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.ExportToPNG = new System.Windows.Forms.Button();
+<<<<<<< HEAD
             this.DisplayResourceConsumptionAtTime = new System.Windows.Forms.CheckBox();
             this.DisplayMakespan = new System.Windows.Forms.CheckBox();
+=======
+>>>>>>> parent of 7b4be7a... PDF-Export Method
             this.SuspendLayout();
             // 
             // SelectResourceType
@@ -85,6 +88,7 @@
             this.ExportToPNG.UseVisualStyleBackColor = true;
             this.ExportToPNG.Click += new System.EventHandler(this.ExportToPNG_Click);
             // 
+<<<<<<< HEAD
             // DisplayResourceConsumptionAtTime
             // 
             this.DisplayResourceConsumptionAtTime.AutoSize = true;
@@ -107,13 +111,18 @@
             this.DisplayMakespan.UseVisualStyleBackColor = true;
             this.DisplayMakespan.CheckedChanged += new System.EventHandler(this.DisplayMakespan_CheckedChanged);
             // 
+=======
+>>>>>>> parent of 7b4be7a... PDF-Export Method
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 703);
+<<<<<<< HEAD
             this.Controls.Add(this.DisplayMakespan);
             this.Controls.Add(this.DisplayResourceConsumptionAtTime);
+=======
+>>>>>>> parent of 7b4be7a... PDF-Export Method
             this.Controls.Add(this.ExportToPNG);
             this.Controls.Add(this.RefreshSchedule);
             this.Controls.Add(this.OpenFile);
@@ -133,7 +142,10 @@
         private System.Windows.Forms.Button RefreshSchedule;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button ExportToPNG;
+<<<<<<< HEAD
         private System.Windows.Forms.CheckBox DisplayResourceConsumptionAtTime;
         private System.Windows.Forms.CheckBox DisplayMakespan;
+=======
+>>>>>>> parent of 7b4be7a... PDF-Export Method
     }
 }

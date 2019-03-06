@@ -98,6 +98,7 @@ namespace Gantt_Tool
         {
             ChildForm.ExportToPng();
         }
+<<<<<<< HEAD
 
         private void CloseThread()
         {
@@ -127,5 +128,7 @@ namespace Gantt_Tool
                 ChildForm.RemoveMakespan();
             }
         }
+=======
+>>>>>>> parent of 7b4be7a... PDF-Export Method
     }
 }
