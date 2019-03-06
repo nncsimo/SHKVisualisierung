@@ -8,6 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using Syncfusion.Pdf.Graphics;
+using Syncfusion.PdfViewer;
+using Syncfusion.Pdf.Functions;
+using Syncfusion.Windows.PdfViewer;
+using Syncfusion.XPS;
+using Syncfusion.Pdf;
+using System.IO;
+
 
 namespace Gantt_Tool
 {
@@ -368,6 +376,30 @@ namespace Gantt_Tool
         private void chart1_Click_1(object sender, EventArgs e)
         {
 
+        }
+
+        public void ExportToPDF()
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(ExportToPng));
+            }
+            else
+            {
+                chart1.SaveImage("test.png", ChartImageFormat.Png);
+            }
+
+            PdfDocument document = new PdfDocument();
+            document.PageSettings.Margins.All = 0;
+            MemoryStream ms = new MemoryStream();
+            document.Save(ms);
+            PdfImage image = new PdfBitmap("test.png");
+            PdfPage page = document.Pages.Add();
+            //Draw chart as image
+            page.Graphics.DrawImage(image, new RectangleF(100, 100, 300, 300));
+            //Save and close PDF document
+            document.Save("test.pdf");
+            document.Close(true);
         }
     }
 }
