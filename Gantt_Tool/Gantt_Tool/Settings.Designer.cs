@@ -33,24 +33,23 @@
             this.RefreshSchedule = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.ExportToPNG = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // SelectResourceType
             // 
             this.SelectResourceType.FormattingEnabled = true;
-            this.SelectResourceType.Location = new System.Drawing.Point(50, 173);
-            this.SelectResourceType.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.SelectResourceType.Location = new System.Drawing.Point(33, 111);
             this.SelectResourceType.Name = "SelectResourceType";
-            this.SelectResourceType.Size = new System.Drawing.Size(180, 33);
+            this.SelectResourceType.Size = new System.Drawing.Size(121, 24);
             this.SelectResourceType.TabIndex = 0;
             this.SelectResourceType.SelectedIndexChanged += new System.EventHandler(this.SelectResourceType_SelectedIndexChanged);
             // 
             // OpenFile
             // 
-            this.OpenFile.Location = new System.Drawing.Point(50, 44);
-            this.OpenFile.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.OpenFile.Location = new System.Drawing.Point(33, 28);
             this.OpenFile.Name = "OpenFile";
-            this.OpenFile.Size = new System.Drawing.Size(182, 50);
+            this.OpenFile.Size = new System.Drawing.Size(121, 32);
             this.OpenFile.TabIndex = 1;
             this.OpenFile.Text = "Open File";
             this.OpenFile.UseVisualStyleBackColor = true;
@@ -58,10 +57,9 @@
             // 
             // RefreshSchedule
             // 
-            this.RefreshSchedule.Location = new System.Drawing.Point(50, 442);
-            this.RefreshSchedule.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.RefreshSchedule.Location = new System.Drawing.Point(33, 283);
             this.RefreshSchedule.Name = "RefreshSchedule";
-            this.RefreshSchedule.Size = new System.Drawing.Size(182, 48);
+            this.RefreshSchedule.Size = new System.Drawing.Size(121, 31);
             this.RefreshSchedule.TabIndex = 2;
             this.RefreshSchedule.Text = "Refresh";
             this.RefreshSchedule.UseVisualStyleBackColor = true;
@@ -74,25 +72,38 @@
             // 
             // ExportToPNG
             // 
-            this.ExportToPNG.Location = new System.Drawing.Point(50, 528);
+            this.ExportToPNG.Location = new System.Drawing.Point(33, 338);
+            this.ExportToPNG.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.ExportToPNG.Name = "ExportToPNG";
-            this.ExportToPNG.Size = new System.Drawing.Size(180, 48);
+            this.ExportToPNG.Size = new System.Drawing.Size(120, 31);
             this.ExportToPNG.TabIndex = 3;
             this.ExportToPNG.TabStop = false;
             this.ExportToPNG.Text = "Export as PNG";
             this.ExportToPNG.UseVisualStyleBackColor = true;
             this.ExportToPNG.Click += new System.EventHandler(this.ExportToPNG_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(34, 382);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(120, 31);
+            this.button1.TabIndex = 4;
+            this.button1.TabStop = false;
+            this.button1.Text = "Export as PDF";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.ExportToPDF);
+            // 
             // Settings
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1200, 703);
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.ExportToPNG);
             this.Controls.Add(this.RefreshSchedule);
             this.Controls.Add(this.OpenFile);
             this.Controls.Add(this.SelectResourceType);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Settings";
             this.Text = "Settings";
             this.ResumeLayout(false);
@@ -106,5 +117,6 @@
         private System.Windows.Forms.Button RefreshSchedule;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button ExportToPNG;
+        private System.Windows.Forms.Button button1;
     }
 }

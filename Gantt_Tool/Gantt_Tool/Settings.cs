@@ -67,5 +67,10 @@ namespace Gantt_Tool
         {
             ChildForm.ExportToPng();
         }
+
+        private void ExportToPDF(object sender, EventArgs e)
+        {
+            ChildForm.ExportToPDF();
+        }
     }
 }
