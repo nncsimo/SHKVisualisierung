@@ -26,6 +26,7 @@ namespace Gantt_Tool
             DisplayMakespan.Visible = false;
             RefreshSchedule.Visible = false;
             ExportToPNG.Visible = false;
+            ExportToPDF.Visible = false;
             FormsList = new List<ReadModel>();
         }
 
@@ -47,6 +48,7 @@ namespace Gantt_Tool
                 DisplayResourceConsumptionAtTime.Visible = false;
                 DisplayMakespan.Visible = false;
                 ExportToPNG.Visible = false;
+                ExportToPDF.Visible = false;
             }
             catch (Exception)
             {
@@ -82,6 +84,7 @@ namespace Gantt_Tool
             DisplayResourceConsumptionAtTime.Visible = true;
             DisplayMakespan.Visible = true;
             ExportToPNG.Visible = true;
+            ExportToPDF.Visible = true;
         }
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
@@ -126,6 +129,12 @@ namespace Gantt_Tool
             {
                 ChildForm.RemoveMakespan();
             }
+        }
+
+
+        private void ExportToPDF_click(object sender, EventArgs e)
+        {
+            ChildForm.ExportToPDF();
         }
     }
 }
