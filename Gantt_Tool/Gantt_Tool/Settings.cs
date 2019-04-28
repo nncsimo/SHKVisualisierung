@@ -15,19 +15,14 @@ namespace Gantt_Tool
     public partial class Settings : Form
     {
         UserSettings CurrentSettings { get; set; }
-        public ReadModel ChildForm;
-        public List<ReadModel> FormsList { get; set; }
+        public ChartForm ChildForm;
+        public List<ChartForm> FormsList { get; set; }
+        public string filename { get; set; }
 
         public Settings()
         {
             InitializeComponent();
-            SelectResourceType.Visible = false;
-            DisplayResourceConsumptionAtTime.Visible = false;
-            DisplayMakespan.Visible = false;
-            RefreshSchedule.Visible = false;
-            ExportToPNG.Visible = false;
-            ExportToPDF.Visible = false;
-            FormsList = new List<ReadModel>();
+            FormsList = new List<ChartForm>();
         }
 
         public void Settings_Load(object sender, EventArgs e)
@@ -38,69 +33,40 @@ namespace Gantt_Tool
         public void OpenFile_Click(object sender, EventArgs e)
         {
             openFileDialog1.ShowDialog();
-            try
-            {
-                string filedirectory = openFileDialog1.FileName;
-                CurrentSettings = new UserSettings(filedirectory);
+            
+            string filedirectory = openFileDialog1.FileName;
 
-                InitializeComponent();
-                SelectResourceType.Visible = false;
-                DisplayResourceConsumptionAtTime.Visible = false;
-                DisplayMakespan.Visible = false;
-                ExportToPNG.Visible = false;
-                ExportToPDF.Visible = false;
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Please select a file from the file dialog window.");
-                return;
-            }       
-     
-            // Wenn SData erstellt, dann Anzeige der Einstellmöglichkeiten
+            string[] dump = filedirectory.Split('\\');
+            label_filename.Text = dump[dump.Length - 1];
+            filename = dump[dump.Length - 1];
 
-            for (int i = 1; i < CurrentSettings.SelectedSchedule.NumberOfRenewableResources + 1; i++)
-            {
-                SelectResourceType.Items.Add(i);
-            }
-            SelectResourceType.SelectedIndex = CurrentSettings.DisplayedResource - 1;
+            bool ResourceConsumptionAtTime_Setting = DisplayResourceConsumptionAtTime.Checked;
+            bool Makespan_Setting = DisplayMakespan.Checked;
+
+            CurrentSettings = new UserSettings(filedirectory, ResourceConsumptionAtTime_Setting, Makespan_Setting);
+
+            ChildForm = new ChartForm(this, CurrentSettings, filename);
+            FormsList.Add(ChildForm);
+            new Thread(() => ChildForm.ShowDialog()).Start();  
+            
         }
 
-        public void RefreshSchedule_Click(object sender, EventArgs e)
+        public void NewChartWindow_Click(object sender, EventArgs e)
         {
-            CurrentSettings.DisplayedResource = Convert.ToInt32(SelectResourceType.SelectedItem.ToString());
+            CurrentSettings.ResourceConsumptionAtTime_Setting = DisplayResourceConsumptionAtTime.Checked;
+            CurrentSettings.Makespan_Setting = DisplayMakespan.Checked;
 
-            ChildForm = new ReadModel(this, CurrentSettings);
+            ChildForm = new ChartForm(this, CurrentSettings, filename);
             FormsList.Add(ChildForm);
-
-            //if (FormsList.Count > 1)
-            //{
-            //    CloseThread();
-            //    FormsList.RemoveAt(0);
-            //}
          
             new Thread(() => ChildForm.ShowDialog()).Start();
-
-            SelectResourceType.Visible = true;
-            DisplayResourceConsumptionAtTime.Visible = true;
-            DisplayMakespan.Visible = true;
-            ExportToPNG.Visible = true;
-            ExportToPDF.Visible = true;
+            
         }
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
             
-        }
-
-        private void SelectResourceType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void ExportToPNG_Click(object sender, EventArgs e)
-        {
-            ChildForm.ExportToPng();
-        }
+        }       
 
         private void CloseThread()
         {
@@ -111,11 +77,21 @@ namespace Gantt_Tool
         {
             if (DisplayResourceConsumptionAtTime.Checked == true)
             {
-                ChildForm.AddResourceConsumptionAtTime();
+                CurrentSettings.ResourceConsumptionAtTime_Setting = true;
+
+                foreach (ChartForm item in FormsList)
+                {
+                    item.AddResourceConsumptionAtTime();
+                }               
             }
             if (DisplayResourceConsumptionAtTime.Checked == false)
             {
-                ChildForm.RemoveResourceConsumptionAtTime();
+                CurrentSettings.ResourceConsumptionAtTime_Setting = false;
+
+                foreach (ChartForm item in FormsList)
+                {
+                    item.RemoveResourceConsumptionAtTime();
+                }
             }
         }
 
@@ -123,18 +99,28 @@ namespace Gantt_Tool
         {
             if (DisplayMakespan.Checked == true)
             {
-                ChildForm.AddMakespan();
+                CurrentSettings.Makespan_Setting = true;
+
+                foreach (ChartForm item in FormsList)
+                {
+                    item.AddMakespan();
+                }
             }
             if (DisplayMakespan.Checked == false)
             {
-                ChildForm.RemoveMakespan();
+                CurrentSettings.Makespan_Setting = false;
+
+                foreach (ChartForm item in FormsList)
+                {
+                    item.RemoveMakespan();
+                }
             }
         }
 
-
-        private void ExportToPDF_click(object sender, EventArgs e)
+        private void label_filename_Click(object sender, EventArgs e)
         {
-            ChildForm.ExportToPDF();
+
         }
+       
     }
 }

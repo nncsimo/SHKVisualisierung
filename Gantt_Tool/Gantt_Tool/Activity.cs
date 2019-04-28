@@ -18,6 +18,7 @@ namespace Gantt_Tool
         public int[] renewableResourceConsumption{ get; set; }
         public int[] nonrenewableResourceConsumption{ get; set; }
         public int yValue { get; set; }
+        public int UpperBoxLine { get; set; }
 
         public Activity(int inituserID, int initID, int initStart, int initJobDur, int[] initRenewCons, int[] initNonRenewCons)
         {

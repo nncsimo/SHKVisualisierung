@@ -14,24 +14,87 @@ using Syncfusion.Pdf.Graphics;
 
 namespace Gantt_Tool
 {
-    public partial class ReadModel : Form
+    public partial class ChartForm : Form
     {
         private Settings _ParentForm;
+        private UserSettings SelectedSettings;
+        private string filename { get; set; }
 
-        public ReadModel(Settings parentForm, UserSettings SelectedSettings)
-        {
-            
+        public ChartForm(Settings parentForm, UserSettings SelectedSettings, string filename)
+        {            
             InitializeComponent();
             _ParentForm = parentForm;
+            this.SelectedSettings = SelectedSettings;
+            this.filename = filename;
+
             chart1.Series[0].Points.Clear();
             SelectedSettings.SelectedSchedule.CurrentActivities.Clear();
             SelectedSettings.SelectedSchedule.AlreadyPainted.Clear();
             CalculateBoxes(SelectedSettings);
 
+            CalculateUpperBoxLine(SelectedSettings);
+
             CreateChart(SelectedSettings);
 
             DrawResourceConsumptionAtTime(SelectedSettings);
             DrawMakespan(SelectedSettings);
+
+            UpdateChartLayers();
+
+            for (int i = 1; i < SelectedSettings.SelectedSchedule.NumberOfRenewableResources + 1; i++)
+            {
+                SelectedResourceType.Items.Add(i);
+            }
+
+            SelectedResourceType.SelectedIndex = SelectedSettings.DisplayedResource - 1;
+            this.Text = this.filename + " - Resource " + (SelectedSettings.DisplayedResource);
+        }
+
+        public void DrawSchedule(Settings parentForm, UserSettings SelectedSettings)
+        {
+            chart1.Series[0].Points.Clear();
+            int count = chart1.Series.Count;
+            for (int i = 1; i < count; i++)
+            {
+                chart1.Series.RemoveAt(1);
+            }
+            
+            SelectedSettings.SelectedSchedule.CurrentActivities.Clear();
+            SelectedSettings.SelectedSchedule.AlreadyPainted.Clear();
+            CalculateBoxes(SelectedSettings);
+
+            CalculateUpperBoxLine(SelectedSettings);
+
+            CreateChart(SelectedSettings);
+
+            DrawResourceConsumptionAtTime(SelectedSettings);
+            DrawMakespan(SelectedSettings);
+
+            UpdateChartLayers();
+
+            this.Text = this.filename + " - Resource " + (SelectedSettings.DisplayedResource);
+        }
+
+        public void UpdateChartLayers()
+        {            
+
+            if (SelectedSettings.ResourceConsumptionAtTime_Setting)
+            {
+                AddResourceConsumptionAtTime();
+            }
+            else
+            {
+                RemoveResourceConsumptionAtTime();
+            }
+
+            if (SelectedSettings.Makespan_Setting)
+            {
+                AddMakespan();
+            }
+            else
+            {
+                RemoveMakespan();
+            }
         }
 
         public void ReadModel_Load(object sender, EventArgs e)
@@ -63,7 +126,7 @@ namespace Gantt_Tool
 
                 if (Set.SelectedSchedule.CurrentActivities.Count > 0)
                 {
-                    if (!Set.SelectedSchedule.CurrentActivities.Intersect(Set.SelectedSchedule.AlreadyPainted).Any())
+                    if (!Set.SelectedSchedule.CurrentActivities.Intersect(Set.SelectedSchedule.AlreadyPainted).Any(x => x.renewableResourceConsumption[Set.DisplayedResource - 1] != 0))
                     {
                         Set.SelectedSchedule.CurrentActivities = Set.SelectedSchedule.CurrentActivities.OrderByDescending(x => x.jobDuration).ToList();
 
@@ -80,7 +143,7 @@ namespace Gantt_Tool
                             Set.SelectedSchedule.AlreadyPainted.Add(Set.SelectedSchedule.CurrentActivities[k]);
                         }
                     }
-                    else if (Set.SelectedSchedule.CurrentActivities.Intersect(Set.SelectedSchedule.AlreadyPainted).Any())
+                    else if (Set.SelectedSchedule.CurrentActivities.Intersect(Set.SelectedSchedule.AlreadyPainted).Any(x => x.renewableResourceConsumption[Set.DisplayedResource - 1] != 0))
                     {
                         List<Activity> ToPaint = new List<Activity>();
                         int count = Set.SelectedSchedule.CurrentActivities.Except(Set.SelectedSchedule.AlreadyPainted).Count();
@@ -93,6 +156,7 @@ namespace Gantt_Tool
                             for (int w = 0; w < count; w++)
                             {                           
                                     List<Activity> CurrentAndPainted = Set.SelectedSchedule.CurrentActivities.Intersect(Set.SelectedSchedule.AlreadyPainted).ToList();
+                                    CurrentAndPainted.RemoveAll(x => x.renewableResourceConsumption[Set.DisplayedResource - 1] == 0);
                                     CurrentAndPainted = CurrentAndPainted.OrderBy(x => x.yValue).ToList();
 
                                     for (int s = 0; s < CurrentAndPainted.Count + 1; s++)
@@ -131,6 +195,14 @@ namespace Gantt_Tool
             }
         }
 
+        public void CalculateUpperBoxLine(UserSettings Set)
+        {
+            foreach (Activity activity in Set.SelectedSchedule.ListOfActivities)
+            {
+                activity.UpperBoxLine = activity.yValue + activity.renewableResourceConsumption[Set.DisplayedResource - 1];
+            }
+        }
+
         public void CreateChart(UserSettings SelectedSettings)
         {
             // Set axis options
@@ -138,14 +210,14 @@ namespace Gantt_Tool
             Axis ax = chart1.ChartAreas[0].AxisX;
             Axis ay = chart1.ChartAreas[0].AxisY;
             ax.Maximum = SelectedSettings.SelectedSchedule.Makespan + 1;
-            ay.Maximum = SelectedSettings.SelectedSchedule.ListOfActivities.Max(x => x.yValue) + SelectedSettings.SelectedSchedule.ListOfActivities.FindAll(x => x.yValue == SelectedSettings.SelectedSchedule.ListOfActivities.Max(z => z.yValue)).Max(j => j.renewableResourceConsumption[SelectedSettings.DisplayedResource - 1]);
+            ay.Maximum = SelectedSettings.SelectedSchedule.ListOfActivities.Max(x => x.UpperBoxLine);
             ax.Interval = 1;
             ay.Interval = 1;
             ax.MajorGrid.Enabled = false;
             ay.MajorGrid.Enabled = false;
             ax.ArrowStyle = AxisArrowStyle.Lines;
             ay.ArrowStyle = AxisArrowStyle.Lines;
-            ax.Title = "t = time";
+            ax.Title = "t";
             ay.Title = "Consumption of renewable resource " + SelectedSettings.DisplayedResource;
 
             // Add boxes for the activities to the chart area
@@ -155,7 +227,10 @@ namespace Gantt_Tool
 
             foreach (Activity activity in SelectedSettings.SelectedSchedule.ListOfActivities)
             {
-                AddBox(series1, activity.startingTime, activity.yValue, activity.jobDuration, activity.renewableResourceConsumption[SelectedSettings.DisplayedResource - 1], Convert.ToString(activity.UserID));
+                if (activity.renewableResourceConsumption[SelectedSettings.DisplayedResource - 1] > 0)
+                {
+                    AddBox(series1, activity.startingTime, activity.yValue, activity.jobDuration, activity.renewableResourceConsumption[SelectedSettings.DisplayedResource - 1], Convert.ToString(activity.UserID));
+                }            
             }
 
             this.chart1.PostPaint += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ChartPaintEventArgs>(this.PostPaint);
@@ -234,15 +309,20 @@ namespace Gantt_Tool
                 i++;
             }
 
-            for (int i = 1; i < points.Count - 1; i++)
+            for (int i = 1; i < points.Count; i++)
             {
-                if (points[i].Y != points[i + 2].Y)
+                if (i == points.Count - 1)
                 {
                     Points.Points.AddXY(points[i].X, points[i].Y);
-                }         
+                }
+                else if (points[i].Y != points[i + 2].Y)
+                {
+                    Points.Points.AddXY(points[i].X, points[i].Y);
+                }
+
                 i++;
             }
-
+           
             foreach (var point in Points.Points)
             {
                 point.MarkerStyle = MarkerStyle.Circle;
@@ -395,6 +475,23 @@ namespace Gantt_Tool
                 //Save and close PDF document
                 document.Save("test.pdf");
                 document.Close(true);
+        }
+
+        private void SelectedResourceType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SelectedSettings.DisplayedResource = Convert.ToInt32(SelectedResourceType.SelectedItem.ToString());
+
+            DrawSchedule(_ParentForm, this.SelectedSettings);
+        }
+
+        private void ExportPNG_Click(object sender, EventArgs e)
+        {
+            ExportToPng();
+        }
+
+        private void ExportPDF_Click(object sender, EventArgs e)
+        {
+            ExportToPDF();
         }
     }
 }
