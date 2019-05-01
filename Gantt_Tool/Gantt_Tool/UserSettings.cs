@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Windows.Forms;
 
 namespace Gantt_Tool
 {
@@ -16,7 +18,15 @@ namespace Gantt_Tool
 
         public UserSettings(string filename, bool ResourceConsumptionAtTime_Setting, bool Makespan_Setting)
         {
-            SelectedSchedule = new ScheduleData(filename);
+            try
+            {
+                SelectedSchedule = new ScheduleData(filename);
+            }
+            catch (FileNotFoundException e)
+            {
+                MessageBox.Show($"The selected file was not found or no file was selected. Please select a file.");
+            }
+
             DisplayedResource = 1;
 
             this.ResourceConsumptionAtTime_Setting = ResourceConsumptionAtTime_Setting;

@@ -14,7 +14,7 @@ namespace Gantt_Tool
 {
     public partial class Settings : Form
     {
-        UserSettings CurrentSettings { get; set; }
+        List<UserSettings> CurrentSettings { get; set; }
         public ChartForm ChildForm;
         public List<ChartForm> FormsList { get; set; }
         public string filename { get; set; }
@@ -23,6 +23,7 @@ namespace Gantt_Tool
         {
             InitializeComponent();
             FormsList = new List<ChartForm>();
+            CurrentSettings = new List<UserSettings>();
         }
 
         public void Settings_Load(object sender, EventArgs e)
@@ -32,41 +33,52 @@ namespace Gantt_Tool
 
         public void OpenFile_Click(object sender, EventArgs e)
         {
-            openFileDialog1.ShowDialog();
+            openFileDialog.Filter = "CSV files (*.csv)|*.csv";
+            openFileDialog.ShowDialog();
             
-            string filedirectory = openFileDialog1.FileName;
+            string filedirectory = openFileDialog.FileName;
 
             string[] dump = filedirectory.Split('\\');
             label_filename.Text = dump[dump.Length - 1];
             filename = dump[dump.Length - 1];
 
-            bool ResourceConsumptionAtTime_Setting = DisplayResourceConsumptionAtTime.Checked;
-            bool Makespan_Setting = DisplayMakespan.Checked;
+            string[] filenamePieces = filename.Split('.');
 
-            CurrentSettings = new UserSettings(filedirectory, ResourceConsumptionAtTime_Setting, Makespan_Setting);
+            if(filenamePieces[filenamePieces.Length - 1] == "csv" | filenamePieces[filenamePieces.Length - 1] == openFileDialog.FileName)
+            {
+                bool ResourceConsumptionAtTime_Setting = DisplayResourceConsumptionAtTime.Checked;
+                bool Makespan_Setting = DisplayMakespan.Checked;
 
-            ChildForm = new ChartForm(this, CurrentSettings, filename);
-            FormsList.Add(ChildForm);
-            new Thread(() => ChildForm.ShowDialog()).Start();  
-            
+                try
+                {
+                    CurrentSettings.Add(new UserSettings(filedirectory, ResourceConsumptionAtTime_Setting, Makespan_Setting));
+                    ChildForm = new ChartForm(this, CurrentSettings[CurrentSettings.Count - 1], filename);
+                    FormsList.Add(ChildForm);
+                    new Thread(() => ChildForm.ShowDialog()).Start();
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("The selected file is not a .csv file. Please select a .csv file.");
+                Array.Clear(filenamePieces, 0, filenamePieces.Length - 1);
+            }
         }
 
         public void NewChartWindow_Click(object sender, EventArgs e)
         {
-            CurrentSettings.ResourceConsumptionAtTime_Setting = DisplayResourceConsumptionAtTime.Checked;
-            CurrentSettings.Makespan_Setting = DisplayMakespan.Checked;
+            CurrentSettings[CurrentSettings.Count - 1].ResourceConsumptionAtTime_Setting = DisplayResourceConsumptionAtTime.Checked;
+            CurrentSettings[CurrentSettings.Count - 1].Makespan_Setting = DisplayMakespan.Checked;
 
-            ChildForm = new ChartForm(this, CurrentSettings, filename);
+            ChildForm = new ChartForm(this, CurrentSettings[CurrentSettings.Count - 1], filename);
             FormsList.Add(ChildForm);
          
             new Thread(() => ChildForm.ShowDialog()).Start();
             
         }
-
-        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
-        {
-            
-        }       
 
         private void CloseThread()
         {
@@ -77,8 +89,11 @@ namespace Gantt_Tool
         {
             if (DisplayResourceConsumptionAtTime.Checked == true)
             {
-                CurrentSettings.ResourceConsumptionAtTime_Setting = true;
-
+                foreach (UserSettings Setting in CurrentSettings)
+                {
+                    Setting.ResourceConsumptionAtTime_Setting = true;
+                }
+               
                 foreach (ChartForm item in FormsList)
                 {
                     item.AddResourceConsumptionAtTime();
@@ -86,8 +101,11 @@ namespace Gantt_Tool
             }
             if (DisplayResourceConsumptionAtTime.Checked == false)
             {
-                CurrentSettings.ResourceConsumptionAtTime_Setting = false;
-
+                foreach (UserSettings Setting in CurrentSettings)
+                {
+                    Setting.ResourceConsumptionAtTime_Setting = false;
+                }
+                
                 foreach (ChartForm item in FormsList)
                 {
                     item.RemoveResourceConsumptionAtTime();
@@ -99,7 +117,10 @@ namespace Gantt_Tool
         {
             if (DisplayMakespan.Checked == true)
             {
-                CurrentSettings.Makespan_Setting = true;
+                foreach (UserSettings Setting in CurrentSettings)
+                {
+                    Setting.Makespan_Setting = true;
+                }
 
                 foreach (ChartForm item in FormsList)
                 {
@@ -108,7 +129,10 @@ namespace Gantt_Tool
             }
             if (DisplayMakespan.Checked == false)
             {
-                CurrentSettings.Makespan_Setting = false;
+                foreach (UserSettings Setting in CurrentSettings)
+                {
+                    Setting.Makespan_Setting = false;
+                }
 
                 foreach (ChartForm item in FormsList)
                 {
@@ -121,6 +145,10 @@ namespace Gantt_Tool
         {
 
         }
-       
+
+        private void openFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
+
+        }
     }
 }

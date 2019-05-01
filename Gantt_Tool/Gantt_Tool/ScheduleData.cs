@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Windows.Forms;
 
 namespace Gantt_Tool
 {
@@ -28,116 +29,116 @@ namespace Gantt_Tool
         public List<Activity> CurrentActivities { get; set; }
 
         public ScheduleData(string filename) {
-            using (StreamReader sr = new StreamReader(filename))
-            {
-                char[] charSeperator = new char[] { ';' };
-
-                // Skip line
-                sr.ReadLine();
-
-                // Read job 
-                int[] initData =  Array.ConvertAll(sr.ReadLine().Split(charSeperator, StringSplitOptions.RemoveEmptyEntries), int.Parse);
-
-                // Write data to properties
-                NumberOfActivities = initData[0];
-                NumberOfRenewableResources = initData[1];
-                NumberOfNonRenewableResources = initData[2];
-
-                // Skip header line
-                sr.ReadLine();
-
-                // Create ListofActivities
-                ListOfActivities = new List<Activity>();
-
-                AlreadyPainted = new List<Activity>();
-
-                CurrentActivities = new List<Activity>();
-
-                // Read activity data
-                for (int i = 0; i < NumberOfActivities; i++)
+            
+                using (StreamReader sr = new StreamReader(filename))
                 {
-                    initData = Array.ConvertAll(sr.ReadLine().Split(charSeperator, StringSplitOptions.RemoveEmptyEntries), int.Parse);
+                    char[] charSeperator = new char[] { ';' };
 
-                    int z = 0;
-                    int userid = initData[z]; z++;
-                    int id = i;
-                    int startTime = initData[z]; z++;
-                    int jobDuration = initData[z]; z++;
+                    // Skip line
+                    sr.ReadLine();
 
-                    int[] renewResDump = new int[NumberOfRenewableResources];
-                    int[] nonrenewResDump = new int[NumberOfNonRenewableResources];
+                    // Read job 
+                    int[] initData = Array.ConvertAll(sr.ReadLine().Split(charSeperator, StringSplitOptions.RemoveEmptyEntries), int.Parse);
 
-                    for (int j = 0; j < NumberOfRenewableResources; j++)
+                    // Write data to properties
+                    NumberOfActivities = initData[0];
+                    NumberOfRenewableResources = initData[1];
+                    NumberOfNonRenewableResources = initData[2];
+
+                    // Skip header line
+                    sr.ReadLine();
+
+                    // Create ListofActivities
+                    ListOfActivities = new List<Activity>();
+
+                    AlreadyPainted = new List<Activity>();
+
+                    CurrentActivities = new List<Activity>();
+
+                    // Read activity data
+                    for (int i = 0; i < NumberOfActivities; i++)
                     {
-                        renewResDump[j] = initData[j + z];
-                    }
+                        initData = Array.ConvertAll(sr.ReadLine().Split(charSeperator, StringSplitOptions.RemoveEmptyEntries), int.Parse);
 
-                    for (int j = 0; j < NumberOfNonRenewableResources; j++)
-                    {
-                        nonrenewResDump[j] = initData[j + NumberOfRenewableResources + z];
-                    }
+                        int z = 0;
+                        int userid = initData[z]; z++;
+                        int id = i;
+                        int startTime = initData[z]; z++;
+                        int jobDuration = initData[z]; z++;
 
-                    Activity activity = new Activity(userid, id, startTime, jobDuration, renewResDump, nonrenewResDump);
+                        int[] renewResDump = new int[NumberOfRenewableResources];
+                        int[] nonrenewResDump = new int[NumberOfNonRenewableResources];
 
-                    ListOfActivities.Add(activity);
-                }
-
-                // Calculate makespan
-
-                Makespan = 0;
-
-                for (int i = 0; i < NumberOfActivities; i++)
-                {
-                    if (ListOfActivities[i].finishTime > Makespan)
-                    {
-                        Makespan = ListOfActivities[i].finishTime;
-                    }
-                }
-
-                // Calculate ResourceConsumptionAtTime
-                ResourceConsumptionAtTime = new int[NumberOfRenewableResources, Makespan];
-
-                for (int i = 0; i < NumberOfRenewableResources; i++) // Resources
-                {
-                    for (int j = 0; j < Makespan; j++) // Time
-                    {
-                        for (int k = 0; k < NumberOfActivities; k++)
+                        for (int j = 0; j < NumberOfRenewableResources; j++)
                         {
-                            if (ListOfActivities[k].startingTime <= j && j < ListOfActivities[k].finishTime)
+                            renewResDump[j] = initData[j + z];
+                        }
+
+                        for (int j = 0; j < NumberOfNonRenewableResources; j++)
+                        {
+                            nonrenewResDump[j] = initData[j + NumberOfRenewableResources + z];
+                        }
+
+                        Activity activity = new Activity(userid, id, startTime, jobDuration, renewResDump, nonrenewResDump);
+
+                        ListOfActivities.Add(activity);
+                    }
+
+                    // Calculate makespan
+
+                    Makespan = 0;
+
+                    for (int i = 0; i < NumberOfActivities; i++)
+                    {
+                        if (ListOfActivities[i].finishTime > Makespan)
+                        {
+                            Makespan = ListOfActivities[i].finishTime;
+                        }
+                    }
+
+                    // Calculate ResourceConsumptionAtTime
+                    ResourceConsumptionAtTime = new int[NumberOfRenewableResources, Makespan];
+
+                    for (int i = 0; i < NumberOfRenewableResources; i++) // Resources
+                    {
+                        for (int j = 0; j < Makespan; j++) // Time
+                        {
+                            for (int k = 0; k < NumberOfActivities; k++)
                             {
-                                ResourceConsumptionAtTime[i, j] += ListOfActivities[k].renewableResourceConsumption[i];
+                                if (ListOfActivities[k].startingTime <= j && j < ListOfActivities[k].finishTime)
+                                {
+                                    ResourceConsumptionAtTime[i, j] += ListOfActivities[k].renewableResourceConsumption[i];
+                                }
                             }
                         }
                     }
-                }
 
-                MaximumResourceConsumption = new int[NumberOfRenewableResources];
-                //MaximumResourceConsumption[i] = 0;
+                    MaximumResourceConsumption = new int[NumberOfRenewableResources];
 
-                for (int i = 0; i < NumberOfRenewableResources; i++)
-                {
-                    for (int j = 0; j < Makespan; j++)
-                    {                       
-                        if (MaximumResourceConsumption[i] < ResourceConsumptionAtTime[i,j])
-                        {
-                            MaximumResourceConsumption[i] = ResourceConsumptionAtTime[i,j];
-                        }                        
-                    }         
-                }                                 
-                
-                ActiveActivitiesAtTime = new bool[Makespan, NumberOfActivities];
-
-                for (int t = 0; t < Makespan; t++) // Time
-                {
-                    for (int z = 0; z < NumberOfActivities; z++)
+                    for (int i = 0; i < NumberOfRenewableResources; i++)
                     {
-                        if (ListOfActivities[z].startingTime <= t && t < ListOfActivities[z].finishTime)
+                        for (int j = 0; j < Makespan; j++)
                         {
-                            ActiveActivitiesAtTime[t, z] = true;
+                            if (MaximumResourceConsumption[i] < ResourceConsumptionAtTime[i, j])
+                            {
+                                MaximumResourceConsumption[i] = ResourceConsumptionAtTime[i, j];
+                            }
                         }
                     }
-                }
-            }
+
+                    ActiveActivitiesAtTime = new bool[Makespan, NumberOfActivities];
+
+                    for (int t = 0; t < Makespan; t++) // Time
+                    {
+                        for (int z = 0; z < NumberOfActivities; z++)
+                        {
+                            if (ListOfActivities[z].startingTime <= t && t < ListOfActivities[z].finishTime)
+                            {
+                                ActiveActivitiesAtTime[t, z] = true;
+                            }
+                        }
+                    }
+                }            
         }       
     }
 }

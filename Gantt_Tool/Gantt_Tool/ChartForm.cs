@@ -77,7 +77,6 @@ namespace Gantt_Tool
 
         public void UpdateChartLayers()
         {            
-
             if (SelectedSettings.ResourceConsumptionAtTime_Setting)
             {
                 AddResourceConsumptionAtTime();
@@ -194,7 +193,6 @@ namespace Gantt_Tool
                 }
             }
         }
-
         public void CalculateUpperBoxLine(UserSettings Set)
         {
             foreach (Activity activity in Set.SelectedSchedule.ListOfActivities)
@@ -285,83 +283,92 @@ namespace Gantt_Tool
         }
 
         public void DrawResourceConsumptionAtTime(UserSettings SelectedSettings)
-        {
-            Series Points = chart1.Series.Add("points");
-            Points.ChartType = SeriesChartType.Point;
-
+        {           
             Series Lines = chart1.Series.Add("lines");
             Lines.ChartType = SeriesChartType.Line;
             Lines.Color = Color.Black;
             Lines.BorderWidth = 2;
 
-            List<PointF> points = new List<PointF>();
-            List<Point> lines = new List<Point>();
+            Series Circles = chart1.Series.Add("circles");
+            Circles.ChartType = SeriesChartType.Point;
+            Circles.BackSecondaryColor = Color.White;
+
+            List<PointF> CircleCoordinates = new List<PointF>();
+            List<Point> LineCoordinates = new List<Point>();
 
             for (int i = 0; i < SelectedSettings.SelectedSchedule.Makespan; i++)
             {
-                points.Add(new PointF(i, SelectedSettings.SelectedSchedule.ResourceConsumptionAtTime[SelectedSettings.DisplayedResource - 1, i]));
-                points.Add(new PointF(i + 1, SelectedSettings.SelectedSchedule.ResourceConsumptionAtTime[SelectedSettings.DisplayedResource - 1, i]));
+                CircleCoordinates.Add(new PointF(i, SelectedSettings.SelectedSchedule.ResourceConsumptionAtTime[SelectedSettings.DisplayedResource - 1, i]));
+                CircleCoordinates.Add(new PointF(i + 1, SelectedSettings.SelectedSchedule.ResourceConsumptionAtTime[SelectedSettings.DisplayedResource - 1, i]));
             }
 
             for (int i = 0; i < SelectedSettings.SelectedSchedule.Makespan * 2; i++)
             {
-                lines.Add(new Point(i, i + 1));
+                LineCoordinates.Add(new Point(i, i + 1));
                 i++;
             }
 
-            for (int i = 1; i < points.Count; i++)
+            for (int i = 1; i < CircleCoordinates.Count; i++)
             {
-                if (i == points.Count - 1)
+                if (i == CircleCoordinates.Count - 1)
                 {
-                    Points.Points.AddXY(points[i].X, points[i].Y);
+                    Circles.Points.AddXY(CircleCoordinates[i].X, CircleCoordinates[i].Y);
                 }
-                else if (points[i].Y != points[i + 2].Y)
+                else if (CircleCoordinates[i].Y != CircleCoordinates[i + 2].Y)
                 {
-                    Points.Points.AddXY(points[i].X, points[i].Y);
+                    Circles.Points.AddXY(CircleCoordinates[i].X, CircleCoordinates[i].Y);
                 }
 
                 i++;
             }
-           
-            foreach (var point in Points.Points)
+
+            for (int i = 0; i < Circles.Points.Count; i++)
             {
-                point.MarkerStyle = MarkerStyle.Circle;
-                point.MarkerSize = 8;
-                point.MarkerBorderColor = Color.Black;
-                point.MarkerColor = Color.FromArgb(255, Color.WhiteSmoke);
+                Circles.Points[i].MarkerStyle = MarkerStyle.Circle;
+                Circles.Points[i].MarkerSize = 8;
+                Circles.Points[i].MarkerBorderColor = Color.Black;
+                Circles.Points[i].Color = Color.FromArgb(255, Color.White);
             }
 
-            int count = Points.Points.Count;
+            //foreach (var circle in Circles.Points)
+            //{
+            //    circle.MarkerStyle = MarkerStyle.Circle;
+            //    circle.MarkerSize = 8;
+            //    circle.MarkerBorderColor = Color.Black;
+            //    circle.MarkerColor = Color.FromArgb(255, Color.White);
+            //}           
 
-            for (int j = 0; j < points.Count - 1; j++)
+            int count = Circles.Points.Count;
+
+            for (int j = 0; j < CircleCoordinates.Count - 1; j++)
             {
                 if (j == 0)
                 {
-                    Points.Points.AddXY(points[j].X, points[j].Y);
+                    Circles.Points.AddXY(CircleCoordinates[j].X, CircleCoordinates[j].Y);
                 }
-                else if(points[j].Y != points[j - 2].Y)
+                else if(CircleCoordinates[j].Y != CircleCoordinates[j - 2].Y)
                 {
-                    Points.Points.AddXY(points[j].X, points[j].Y);
+                    Circles.Points.AddXY(CircleCoordinates[j].X, CircleCoordinates[j].Y);
                 }               
                j++;
             }
 
-            for (int i = count; i < Points.Points.Count; i++)
+            for (int i = count; i < Circles.Points.Count; i++)
             {
-                Points.Points[i].MarkerStyle = MarkerStyle.Circle;
-                Points.Points[i].MarkerSize = 8;
-                Points.Points[i].Color = Color.Black;
+                Circles.Points[i].MarkerStyle = MarkerStyle.Circle;
+                Circles.Points[i].MarkerSize = 8;
+                Circles.Points[i].Color = Color.Black;
             }
 
-            foreach (Point ln in lines)
+            foreach (Point Line in LineCoordinates)
             {
-                int p0 = Lines.Points.AddXY(points[ln.X].X, points[ln.X].Y);
-                int p1 = Lines.Points.AddXY(points[ln.Y].X, points[ln.Y].Y);
+                int p0 = Lines.Points.AddXY(CircleCoordinates[Line.X].X, CircleCoordinates[Line.X].Y);
+                int p1 = Lines.Points.AddXY(CircleCoordinates[Line.Y].X, CircleCoordinates[Line.Y].Y);
                 Lines.Points[p0].Color = Color.Transparent;
                 Lines.Points[p1].Color = Color.Black;
             }
 
-            chart1.Series["points"].Enabled = false;
+            chart1.Series["circles"].Enabled = false;
             chart1.Series["lines"].Enabled = false;
         }
 
@@ -372,9 +379,9 @@ namespace Gantt_Tool
                 BeginInvoke(new MethodInvoker(AddResourceConsumptionAtTime));
             }
             else
-            {
-                chart1.Series["points"].Enabled = true;
+            {               
                 chart1.Series["lines"].Enabled = true;
+                chart1.Series["circles"].Enabled = true;
             }    
         }
 
@@ -386,7 +393,7 @@ namespace Gantt_Tool
             }
             else
             {
-                chart1.Series["points"].Enabled = false;
+                chart1.Series["circles"].Enabled = false;
                 chart1.Series["lines"].Enabled = false;
             }
         }
