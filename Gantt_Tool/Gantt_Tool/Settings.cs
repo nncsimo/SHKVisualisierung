@@ -21,7 +21,16 @@ namespace Gantt_Tool
 
         public Settings()
         {
+
             InitializeComponent();
+
+            // StartPosition was set to FormStartPosition.Manual in the properties window.
+            Rectangle screen = Screen.PrimaryScreen.WorkingArea;
+            int w = Width >= screen.Width ? screen.Width : (screen.Width + Width) / 6;
+            int h = Height >= screen.Height ? screen.Height : (screen.Height + Height) / 5;
+            this.Location = new Point((screen.Width - w) / 2, (screen.Height - h) / 2);
+            this.Size = new Size(w, h);
+
             FormsList = new List<ChartForm>();
             CurrentSettings = new List<UserSettings>();
         }

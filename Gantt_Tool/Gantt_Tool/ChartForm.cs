@@ -23,6 +23,18 @@ namespace Gantt_Tool
         public ChartForm(Settings parentForm, UserSettings SelectedSettings, string filename)
         {            
             InitializeComponent();
+
+            this.WindowState = FormWindowState.Normal;
+            Rectangle screen = Screen.PrimaryScreen.WorkingArea;
+            int w = Width >= screen.Width ? screen.Width : (screen.Width + Width) / 4;
+            int h = Height >= screen.Height ? screen.Height : (screen.Height + Height) / 4;
+            this.Size = new Size(w, h);
+
+            int wmax = (int) (screen.Width * 0.6);
+            int hmax = (int)(screen.Height * 0.6);
+
+            this.MaximumSize = new Size(wmax, hmax);
+
             _ParentForm = parentForm;
             this.SelectedSettings = SelectedSettings;
             this.filename = filename;
